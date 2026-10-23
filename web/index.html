@@ -47,6 +47,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      text-decoration: none;
     }
     .badge-orange { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }
     .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
@@ -167,6 +168,24 @@
     }
     .alert-danger { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; }
     .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: #6ee7b7; }
+
+    .video-section {
+      margin-bottom: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+    video { width: 100%; display: block; }
     
     footer {
       text-align: center;
@@ -176,6 +195,9 @@
       color: var(--text-muted);
       font-size: 0.85rem;
     }
+    .quick-links { display: flex; justify-content: center; gap: 16px; margin-top: 10px; }
+    .quick-links a { color: #60a5fa; text-decoration: none; font-size: 0.85rem; }
+    .quick-links a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -191,15 +213,34 @@
         <span class="badge badge-purple">Meterless Engines</span>
         <span class="badge badge-green">NVIDIA Nemotron Reasoner</span>
         <span class="badge badge-blue">Cursor Built</span>
-        <span class="badge badge-green">Spend: $0.00 USD</span>
+        <a href="docs/SLIDES.html" target="_blank" class="badge badge-orange" style="cursor: pointer;">📊 View Pitch Deck</a>
+        <a href="https://github.com/hgreco85/HG-GridMind" target="_blank" class="badge badge-blue">📦 GitHub Repo</a>
       </div>
     </header>
 
+    <!-- Video Demonstration for Judges -->
+    <div class="video-section">
+      <div class="card-title">
+        <span>🎬 Official Video Demonstration (2m 32s · 720p HD)</span>
+        <span style="font-size: 0.8rem; color: #34d399;">Duration: 2:32 · Rule Compliant (1–4 min)</span>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+        End-to-end browser walkthrough demonstrating active hypothesis falsification, Zetaris federation, 4 operational topologies, and fail-closed human approval gating.
+      </p>
+      <div class="video-container">
+        <video controls poster="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='720' viewBox='0 0 1280 720'><rect width='1280' height='720' fill='%23111827'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='32' fill='%2360a5fa'>⚡ HG GridMind — Click to Play Demonstration (2:32)</text></svg>">
+          <source src="docs/hg_gridmind_demo_video.webm" type="video/webm">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+
+    <!-- Case Selector -->
     <div class="case-selector">
-      <button class="case-btn active" onclick="loadCase('8812')">Case 1: INC-8812 (Neutral Lug / Asymmetry)</button>
-      <button class="case-btn" onclick="loadCase('9041')">Case 2: INC-9041 (Real Internal Arc / Buchholz)</button>
-      <button class="case-btn" onclick="loadCase('7720')">Case 3: INC-7720 (Downstream 3-Phase Fault)</button>
-      <button class="case-btn" onclick="loadCase('5501')">Case 4: INC-5501 (Missing Data / Abstention)</button>
+      <button class="case-btn active" onclick="loadCase('8812')">Case 1: INC-8812 (Neutral Lug / Asymmetry · TR Healthy)</button>
+      <button class="case-btn" onclick="loadCase('9041')">Case 2: INC-9041 (Real Internal Arc · Buchholz · Replace TR)</button>
+      <button class="case-btn" onclick="loadCase('7720')">Case 3: INC-7720 (Downstream 3-Phase Fault · Line Broken)</button>
+      <button class="case-btn" onclick="loadCase('5501')">Case 4: INC-5501 (Missing Data · Strict Abstention)</button>
     </div>
 
     <div class="grid">
@@ -291,8 +332,14 @@
     </div>
 
     <footer>
-      <p>HG GridMind | Team HG Stack | Open Agent Hackathon 2026 | Built with Zetaris, Meterless, NVIDIA Nemotron & Cursor</p>
-      <p style="margin-top: 4px; font-family: monospace; font-size: 0.75rem;">Audit Hash: HG-GRIDMIND-ACK-VERIFIED | Incremental Cost: $0.00 USD</p>
+      <p>HG GridMind | Team HG Stack | <strong>Participant: Hernán Francisco Greco</strong> (@hgreco85) | Open Agent Hackathon 2026</p>
+      <div class="quick-links">
+        <a href="https://github.com/hgreco85/HG-GridMind">GitHub Repository</a>
+        <a href="docs/SLIDES.html">Interactive Pitch Deck</a>
+        <a href="docs/JUDGES_GUIDE.md">Judges Guide</a>
+        <a href="docs/SPONSOR_EVALUATION.md">Sponsor Evaluation Audit</a>
+      </div>
+      <p style="margin-top: 8px; font-family: monospace; font-size: 0.75rem;">Audit Hash: HG-GRIDMIND-ACK-VERIFIED | Incremental Cost: $0.00 USD</p>
     </footer>
   </div>
 
@@ -429,7 +476,7 @@
       statusText.className = 'gate-status status-unlocked';
 
       const tokenDisplay = document.getElementById('token-display');
-      tokenDisplay.innerText = 'Token: HUMAN-SIGNOFF-7E93A248 (Hernan Greco)';
+      tokenDisplay.innerText = 'Token: HUMAN-SIGNOFF-7E93A248 (Hernán Francisco Greco)';
       tokenDisplay.style.color = '#34d399';
 
       document.getElementById('danger-alert').style.display = 'none';

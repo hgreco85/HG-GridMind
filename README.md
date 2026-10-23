@@ -1,8 +1,8 @@
 # HG GridMind — Autonomous AI Incident Commander
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests: 100% Offline](https://img.shields.io/badge/Tests-9%2F9%20PASS-brightgreen.svg)]()
-[![Benchmark](https://img.shields.io/badge/Adversarial%20Benchmark-4%2F4%20PASS-success.svg)]()
+[![Tests: 100% Offline](https://img.shields.io/badge/Unit%20Tests-9%2F9%20PASS-brightgreen.svg)]()
+[![Generalization Benchmark](https://img.shields.io/badge/Adversarial%20Benchmark-24%2F24%20PASS-success.svg)]()
 [![Challenge](https://img.shields.io/badge/Challenge%2002-The%20Agent%20That%20Can%20Explain%20Why-orange.svg)]()
 [![Zetaris](https://img.shields.io/badge/Zetaris-Zero--ETL%20Virtual%20SQL-blue.svg)]()
 [![Meterless](https://img.shields.io/badge/Meterless-Context%20Engines-purple.svg)]()
@@ -12,6 +12,16 @@
 
 > **Evidence-linked, auditable operations investigator with active hypothesis falsification, fail-closed human oversight, and zero hallucinated root causes.**  
 > Built for the **Open Agent Hackathon 2026** (**Challenge 02: *The Agent That Can Explain Why***).
+
+---
+
+## Live Links for Evaluators & Judges
+
+- **Public Interactive Demo (HTTPS):** [https://hgreco85.github.io/HG-GridMind/](https://hgreco85.github.io/HG-GridMind/)
+- **Interactive Pitch Deck (7 Slides):** [https://hgreco85.github.io/HG-GridMind/docs/SLIDES.html](https://hgreco85.github.io/HG-GridMind/docs/SLIDES.html)
+- **Official Demo Video (2m 32s · 720p HD):** Embedded directly on the live demo page and located at [`docs/hg_gridmind_demo_video.webm`](docs/hg_gridmind_demo_video.webm).
+- **Code Repository:** [https://github.com/hgreco85/HG-GridMind](https://github.com/hgreco85/HG-GridMind)
+- **Participant:** **Hernán Francisco Greco** (`@hgreco85`) | Team HG Stack
 
 ---
 
@@ -56,7 +66,7 @@ Conventional LLM chatbots fail catastrophically in this domain: they exhibit con
                                           v
 +-----------------------------------------------------------------------------------+
 | 3. REASONING LAYER (NVIDIA Nemotron Causal Engine)                                |
-|    - Dynamic physical constraint evaluation across sensor invariants              |
+|    - Dynamic physical constraint evaluation across continuous sensor invariants   |
 |    - Active falsification: refuting rival hypotheses against sensor ground truth  |
 |    - Explainability synthesis answering WHY with verified row citations          |
 +-----------------------------------------------------------------------------------+
@@ -70,25 +80,27 @@ Conventional LLM chatbots fail catastrophically in this domain: they exhibit con
 +-----------------------------------------------------------------------------------+
 ```
 
-- **Zetaris:** Virtual query federation joining customer tickets, chromatographic oil analysis (DGA), thermography logs, and SCADA telemetry in one pass.
-- **Meterless:** Local context engines (`H-MEM`, `Markovian`, `World Model`) providing structured physical constraints.
-- **NVIDIA Nemotron:** Multi-step causal reasoning engine formulating competing hypotheses and refuting rival theories.
-- **Cursor:** Development environment utilizing AI-assisted developer workflows with strict zero-cost discipline.
+### Technical Disclosure & Sponsor Honesty
+- **Zetaris:** Implemented as a Virtual Data Fabric Adapter & Lightning SQL dialect engine over in-place silos. Organizer cloud registry remains in `[TBC]`; no remote cloud credentials were provided.
+- **Meterless:** Native open-source context protocol implementation in local Python (`H-MEM`, `Markovian`, `World Model`).
+- **NVIDIA Nemotron:** Dual-mode causal engine executing physics-grounded threshold rules by default (ensuring $0.00 spend and zero stochasticity), with a live connector ready for OpenAI-compatible / NIM inference.
+- **Cursor:** Development environment toolchain (v3.19.7).
 
 ---
 
-## 3. Generalization & Adversarial Evaluation
+## 3. Generalization & Adversarial Benchmark (Anti-Overfitting)
 
-To prove that GridMind is **generalizable and not overfitted** to a single case, the suite includes an adversarial benchmark evaluating 4 distinct operational scenarios:
+To mathematically verify that GridMind is **generalizable and not overfitted** to a single demonstration, the test suite executes **24 evaluations** (4 realistic anchor topologies + 20 continuous parametric variations):
 
-| Incident ID | Topology / Condition | Agent Finding | Outcome & Action |
+| Scenario | Condition / Variation | Agent Finding | Outcome & Action |
 |---|---|---|---|
-| **`INC-8812`** | Asymmetrical Load + Loose Lug | **H1 & H2 Refuted · H3 Confirmed** | Transformer healthy; $249,850 USD saved via terminal torque. |
+| **`INC-8812`** | Phase B Unbalance + Loose Lug | **H1 & H2 Refuted · H3 Confirmed** | Transformer healthy; $249,850 USD saved via terminal torque. |
 | **`INC-9041`** | High-Energy Arc + Buchholz Trip | **H1 Confirmed (C2H2 = 14.5 ppm)** | Catastrophic internal breakdown; re-energization locked; replacement mandatory. |
 | **`INC-7720`** | 3-Phase Balanced Feeder Fault | **H2 Confirmed (1600A balanced)** | Downstream car pole collision; transformer 100% undamaged; feeder section isolated. |
 | **`INC-5501`** | Missing DGA Chemistry Data | **Strict Abstention (Zero Hallucination)** | Diagnosis refused due to insufficient sensor proof; manual sampling requested. |
+| **`Parametric 1-20`** | Continuous Random Distributions of $I, C_2H_2, \Delta T$ | **100% Physical Rule Match** | Physics-based invariant classification without static string reliance. |
 
-Run the benchmark with:
+Run the 24-case benchmark with:
 ```bash
 python evaluator.py
 ```
@@ -99,12 +111,12 @@ python evaluator.py
 
 Judges can verify the entire project in less than 60 seconds with zero accounts, zero API keys, and zero spend ($0.00):
 
-### A. Run Test Suite (9 tests in ~0.17s):
+### A. Run Unit Test Suite (9 tests in ~0.25s):
 ```bash
 python main.py test
 ```
 
-### B. Run Adversarial Generalization Benchmark (4 topologies):
+### B. Run Generalization & Adversarial Benchmark (24 evaluations):
 ```bash
 python evaluator.py
 ```
@@ -115,23 +127,18 @@ python evaluator.py
 python main.py run
 
 # Test 2: Authorized dispatch with operator sign-off
-python main.py run --signoff --operator "Judge Evaluator"
+python main.py run --signoff --operator "Hernán Francisco Greco"
 ```
 
-### D. Launch Interactive Web Dashboard:
-```bash
-python main.py web --port 8080
-```
-Open **[http://localhost:8080](http://localhost:8080)** (or double-click `web/index.html`).
-
-### E. Open Pitch Deck (7 Interactive Slides):
-Double-click `docs/SLIDES.html` in any web browser.
+### D. Open Public Web Demo (No install required):
+Visit **[https://hgreco85.github.io/HG-GridMind/](https://hgreco85.github.io/HG-GridMind/)**.
 
 ---
 
 ## 5. Scope & Compliance
 
 - **Track:** Challenge 02 — *The Agent That Can Explain Why*.
+- **Participant:** Hernán Francisco Greco (`@hgreco85`).
 - **Isolation:** Standalone public repository decoupled from internal trading systems.
 - **Data Disclosure:** 100% synthetic utility grid incident records (`fixtures/`); no proprietary EDENOR or customer data.
 - **Cost Invariant:** $0.00 incremental spend throughout.
