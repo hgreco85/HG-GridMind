@@ -1,0 +1,47 @@
+{
+  "incident_id": "INC-2026-UTIL-7720",
+  "asset_id": "TR-308",
+  "occurred_at_utc": "2026-10-22T14:20:00Z",
+  "initial_operator_report": {
+    "observed_symptom": "Disparo instantáneo de alimentador secundario D-04. Operador duda si la falla está en el transformador o en la red de calle.",
+    "initial_hypothesis": "Sospecha de falla interna en devanados secundarios de TR-308."
+  },
+  "synthetic_sources": {
+    "scada_telemetry": [
+      {
+        "row_id": "SCADA-ROW-72015",
+        "timestamp": "2026-10-22T14:19:59Z",
+        "voltage_v": 380,
+        "current_phase_a_amps": 1640.0,
+        "current_phase_b_amps": 1610.5,
+        "current_phase_c_amps": 1625.8,
+        "neutral_current_amps": 18.2,
+        "relay_flags": ["FEEDER_50P_INSTANT_TRIP"]
+      }
+    ],
+    "maintenance_history": [
+      {
+        "row_id": "MAINT-ROW-77101",
+        "sample_date": "2026-10-20T09:00:00Z",
+        "action": "Ensayo DGA cromatográfico periódico",
+        "result_status": "NORMAL",
+        "details": "Hidrógeno: 15 ppm, Acetileno: 0.05 ppm, Metano: 12 ppm. Rigidez dieléctrica: 65 kV. Cuba en estado óptimo."
+      },
+      {
+        "row_id": "MAINT-ROW-77102",
+        "sample_date": "2026-10-20T09:30:00Z",
+        "action": "Termografía infrarroja de bornes",
+        "result_status": "NORMAL",
+        "details": "Bornes MT y BT con gradiente térmico < 3°C respecto a temperatura ambiente."
+      }
+    ],
+    "tickets_database": [
+      {
+        "row_id": "TICKET-ROW-33019",
+        "reported_at": "2026-10-22T14:21:00Z",
+        "ticket_type": "COLISION_VEHICULAR_POSTE",
+        "description": "Llamado vecinal: vehículo pesado impactó columna de baja tensión en esquina Av. Libertador y San Martín, cortando los tres conductores de fase a tierra."
+      }
+    ]
+  }
+}

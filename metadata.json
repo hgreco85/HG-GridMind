@@ -1,0 +1,106 @@
+{
+  "project_name": "HG GridMind — Autonomous AI Incident Commander",
+  "track": "Challenge 02 — The Agent That Can Explain Why",
+  "team_name": "HG Stack",
+  "participants": [
+    {
+      "name": "Horacio Hernan Greco",
+      "role": "Lead Architect & Systems Engineer",
+      "github": "hgreco85"
+    }
+  ],
+  "repository_url": "https://github.com/hgreco85/HG-GridMind",
+  "demo_url": "http://localhost:8080/index.html",
+  "video_demo_path": "docs/hg_gridmind_demo_video.webm",
+  "pitch_deck_path": "docs/SLIDES.html",
+  "license": "MIT",
+  "incremental_cost_usd": 0.0,
+  "sponsor_technologies": {
+    "zetaris": {
+      "used": true,
+      "role": "Zero-ETL Virtual Data Fabric & Lightning SQL Query Engine",
+      "implementation_files": [
+        "src/sponsors/zetaris_adapter.py",
+        "src/data_connector.py"
+      ],
+      "tables_federated": [
+        "scada_telemetry",
+        "maintenance_history",
+        "tickets_database"
+      ],
+      "cloud_status": "Virtual Contract & Local Dialect Engine (cloud registry in TBC by organizers)",
+      "row_level_citations_verified": true
+    },
+    "meterless": {
+      "used": true,
+      "role": "Local-First Context Layer Protocol",
+      "implementation_files": [
+        "src/sponsors/meterless_adapter.py"
+      ],
+      "engines_utilized": [
+        "H-MEM (Hierarchical Chronological Memory)",
+        "Markovian State Transition Engine",
+        "World Model Physical Constraints Engine"
+      ],
+      "open_source_reference": "github.com/Meterless/Meterless",
+      "offline_deterministic": true
+    },
+    "nvidia_nemotron": {
+      "used": true,
+      "role": "Multi-Step Causal Reasoning & Active Hypothesis Falsification",
+      "implementation_files": [
+        "src/sponsors/nemotron_adapter.py",
+        "src/agent.py"
+      ],
+      "architecture": "Deterministic Physical Causal Evaluator with Live LLM Ingestion Connector",
+      "falsification_supported": true,
+      "hypotheses_evaluated_per_incident": 3
+    },
+    "cursor": {
+      "used": true,
+      "role": "AI-Assisted Development Environment",
+      "implementation_files": [
+        "src/sponsors/cursor_audit.py"
+      ],
+      "editor_version": "v3.19.7",
+      "spend_usd": 0.0
+    }
+  },
+  "benchmarks": {
+    "unit_tests_pass": "9/9 tests PASS",
+    "unit_tests_latency_seconds": 0.175,
+    "adversarial_benchmark_scenarios_pass": "4/4 scenarios PASS",
+    "scenarios": [
+      {
+        "id": "INC-8812",
+        "type": "Neutral lug overheating via Phase B asymmetry",
+        "verdict": "REJECTED_AS_FALSE_CORRELATION",
+        "impact_usd": 249850
+      },
+      {
+        "id": "INC-9041",
+        "type": "Catastrophic internal arc in winding tank",
+        "verdict": "CONFIRMED_INTERNAL_CATASTROPHIC_FAILURE",
+        "action": "Immediate transformer condemnation and replacement"
+      },
+      {
+        "id": "INC-7720",
+        "type": "Downstream 3-phase symmetrical line short circuit",
+        "verdict": "CONFIRMED_DOWNSTREAM_FEEDER_FAULT",
+        "action": "Feeder line repair; transformer undamaged"
+      },
+      {
+        "id": "INC-5501",
+        "type": "Missing maintenance and chemical data",
+        "verdict": "ABSTENTION_INSUFFICIENT_EVIDENCE",
+        "action": "Strict abstention (zero hallucination)"
+      }
+    ]
+  },
+  "safety_invariants": {
+    "fail_closed_human_approval_gate": true,
+    "zero_unauthorized_physical_dispatch": true,
+    "durable_ack_signatures": true,
+    "synthetic_data_isolation": true
+  }
+}

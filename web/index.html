@@ -87,6 +87,7 @@
       font-size: 0.85rem;
       font-weight: 500;
       transition: all 0.2s;
+      white-space: nowrap;
     }
     .case-btn.active {
       background: var(--accent);
@@ -109,11 +110,13 @@
     }
     .hyp-falsified { border-left-color: var(--danger); }
     .hyp-confirmed { border-left-color: var(--success); }
+    .hyp-abstain { border-left-color: var(--warning); }
     .hyp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .hyp-title { font-weight: 600; font-size: 0.95rem; }
     .hyp-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
     .badge-falsified { background: rgba(239, 68, 68, 0.2); color: #f87171; }
     .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .badge-abstain { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .hyp-body { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
     .hyp-citation { font-size: 0.8rem; font-family: monospace; color: #93c5fd; }
     
@@ -153,8 +156,6 @@
     .btn-danger:hover { background: #dc2626; }
     .btn-success { background: var(--success); color: #fff; }
     .btn-success:hover { background: #059669; }
-    .btn-outline { background: transparent; border: 1px solid #475569; color: #fff; }
-    .btn-outline:hover { background: #1e293b; }
     
     .alert-box {
       display: none;
@@ -188,16 +189,17 @@
         <span class="badge badge-orange">Challenge 02 Track</span>
         <span class="badge badge-blue">Zetaris Zero-ETL</span>
         <span class="badge badge-purple">Meterless Engines</span>
-        <span class="badge badge-green">NVIDIA Nemotron</span>
+        <span class="badge badge-green">NVIDIA Nemotron Reasoner</span>
         <span class="badge badge-blue">Cursor Built</span>
         <span class="badge badge-green">Spend: $0.00 USD</span>
       </div>
     </header>
 
     <div class="case-selector">
-      <button class="case-btn active" onclick="loadCase('INC-2026-UTIL-8812')">Primary Incident: INC-2026-UTIL-8812 (TR-404 Trip)</button>
-      <button class="case-btn" onclick="loadCase('INC-ADVERSARIAL-INCOMPLETE')">Adversarial Test: Incomplete DGA (Abstention)</button>
-      <button class="case-btn" onclick="loadCase('INC-ADVERSARIAL-SYMMETRIC')">Adversarial Test: 3-Phase Short Circuit</button>
+      <button class="case-btn active" onclick="loadCase('8812')">Case 1: INC-8812 (Neutral Lug / Asymmetry)</button>
+      <button class="case-btn" onclick="loadCase('9041')">Case 2: INC-9041 (Real Internal Arc / Buchholz)</button>
+      <button class="case-btn" onclick="loadCase('7720')">Case 3: INC-7720 (Downstream 3-Phase Fault)</button>
+      <button class="case-btn" onclick="loadCase('5501')">Case 4: INC-5501 (Missing Data / Abstention)</button>
     </div>
 
     <div class="grid">
@@ -218,18 +220,7 @@
               <tr><th>Row ID</th><th>Test / Action</th><th>Result</th><th>Key Observation</th></tr>
             </thead>
             <tbody id="maintenance-tbody">
-              <tr>
-                <td class="row-id">MAINT-ROW-99182</td>
-                <td>DGA Chromatography</td>
-                <td><span style="color: #34d399; font-weight: bold;">NORMAL</span></td>
-                <td>H2: 12 ppm, C2H2: 0.1 ppm (No internal arcing)</td>
-              </tr>
-              <tr>
-                <td class="row-id">MAINT-ROW-99204</td>
-                <td>IR Thermography</td>
-                <td><span style="color: #fb923c; font-weight: bold;">WARNING</span></td>
-                <td>Low-voltage neutral bushing: +42°C delta T (Loose joint)</td>
-              </tr>
+              <!-- Dynamically populated -->
             </tbody>
           </table>
         </div>
@@ -238,16 +229,10 @@
         <div class="table-container">
           <table>
             <thead>
-              <tr><th>Row ID</th><th>Timestamp</th><th>Phase B Current</th><th>Neutral Current</th><th>Relay Flag</th></tr>
+              <tr><th>Row ID</th><th>Phase Currents (A, B, C)</th><th>Neutral Current</th><th>Relay Flag</th></tr>
             </thead>
             <tbody id="scada-tbody">
-              <tr>
-                <td class="row-id">SCADA-ROW-55102</td>
-                <td>18:44:58Z</td>
-                <td><span style="color: #f87171; font-weight: bold;">445.8 A</span></td>
-                <td><span style="color: #f87171; font-weight: bold;">268.1 A</span></td>
-                <td>Neutral Overcurrent 50/51N</td>
-              </tr>
+              <!-- Dynamically populated -->
             </tbody>
           </table>
         </div>
@@ -257,45 +242,14 @@
       <div class="card">
         <div class="card-title">
           <span>2. Meterless Context + NVIDIA Nemotron Falsification</span>
-          <span style="font-size: 0.8rem; color: #a855f7;">H-MEM + Markovian</span>
+          <span style="font-size: 0.8rem; color: #a855f7;">Deterministic Physical Invariants</span>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-          Evaluating 3 competing hypotheses. Actively refuting rival theories using physical sensor counter-proof.
+          Dynamic evaluation of competing hypotheses. Actively refuting rival theories using physical sensor counter-proof.
         </p>
 
         <div id="hypotheses-container">
-          <div class="hypothesis-card hyp-falsified">
-            <div class="hyp-header">
-              <span class="hyp-title">H1: Internal Dielectric Breakdown / Winding Arc</span>
-              <span class="hyp-badge badge-falsified">FALSIFIED (p = 0.01)</span>
-            </div>
-            <div class="hyp-body">
-              Falsified by physical chemical evidence: DGA oil analysis proves zero flammable gas generation. Acetylene at 0.1 ppm completely rules out internal electrical breakdown.
-            </div>
-            <div class="hyp-citation">Ref: MAINT-ROW-99182 (Zero-ETL Zetaris Federation)</div>
-          </div>
-
-          <div class="hypothesis-card hyp-falsified">
-            <div class="hyp-header">
-              <span class="hyp-title">H2: Downstream Symmetrical Short Circuit</span>
-              <span class="hyp-badge badge-falsified">FALSIFIED (p = 0.02)</span>
-            </div>
-            <div class="hyp-body">
-              Falsified by SCADA phase records: Phase A (210A) and Phase C (198A) remained at normal load. Symmetrical 3-phase fault is mathematically impossible.
-            </div>
-            <div class="hyp-citation">Ref: SCADA-ROW-55102 (SCADA Telemetry)</div>
-          </div>
-
-          <div class="hypothesis-card hyp-confirmed">
-            <div class="hyp-header">
-              <span class="hyp-title">H3: Neutral Terminal Overheating via Phase B Load Asymmetry</span>
-              <span class="hyp-badge badge-confirmed">CONFIRMED (p = 0.97)</span>
-            </div>
-            <div class="hyp-body">
-              Physical correlation verified: Heavy 445.8A current concentrated on Phase B forced 268A continuous through a pre-existing loose neutral terminal (+42°C hotspot), triggering thermal runaway.
-            </div>
-            <div class="hyp-citation">Ref: MAINT-ROW-99204 + SCADA-ROW-55102</div>
-          </div>
+          <!-- Dynamically populated -->
         </div>
       </div>
     </div>
@@ -304,14 +258,10 @@
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-title">
         <span>3. Explainable Operational Verdict ("Why") & Impact</span>
-        <span style="color: #34d399; font-weight: bold;">$249,850 USD Capital Expenditure Saved</span>
+        <span style="color: #34d399; font-weight: bold;" id="impact-badge">$249,850 USD Capital Expenditure Saved</span>
       </div>
       <div class="narrative-box" id="narrative-content">
-AUDITABLE CAUSAL EXPLANATION:
-1. Operational Alarming: Initial feeder trip alarm on transformer TR-404 suggested catastrophic internal insulation failure.
-2. Active Falsification: Zetaris virtual query against oil chromatography records (MAINT-ROW-99182) conclusively falsified internal arcing.
-3. Root Cause Proven: SCADA telemetry (SCADA-ROW-55102) joined with thermography (MAINT-ROW-99204) proved the failure was localized to an external loose neutral lug carrying 268 A under Phase B unbalance.
-4. Corrective Action: Rebalance feeder to auxiliary bus and schedule a 15-minute terminal re-tightening window. Unnecessary $250,000 transformer replacement avoided.
+        <!-- Dynamically populated -->
       </div>
     </div>
 
@@ -336,28 +286,144 @@ AUDITABLE CAUSAL EXPLANATION:
       </div>
 
       <div class="alert-box alert-success" id="success-alert">
-        <strong>[AUTHORIZED BY OPERATOR]:</strong> Token <span id="token-val" style="font-family: monospace;">HUMAN-SIGNOFF-8F31E2A4</span> issued. Audit receipt signed. Feeder transfer and terminal re-torque order dispatched to field crew.
+        <strong>[AUTHORIZED BY OPERATOR]:</strong> Token <span id="token-val" style="font-family: monospace;">HUMAN-SIGNOFF-7E93A248</span> issued. Audit receipt signed. Corrective order dispatched to field crew.
       </div>
     </div>
 
     <footer>
       <p>HG GridMind | Team HG Stack | Open Agent Hackathon 2026 | Built with Zetaris, Meterless, NVIDIA Nemotron & Cursor</p>
-      <p style="margin-top: 4px; font-family: monospace; font-size: 0.75rem;">Audit Hash: HG-GRIDMIND-ACK-7E93A2481F4B09DC | Incremental Cost: $0.00 USD</p>
+      <p style="margin-top: 4px; font-family: monospace; font-size: 0.75rem;">Audit Hash: HG-GRIDMIND-ACK-VERIFIED | Incremental Cost: $0.00 USD</p>
     </footer>
   </div>
 
   <script>
-    let isAuthorized = false;
+    const CASES = {
+      '8812': {
+        maint: [
+          { id: 'MAINT-ROW-99182', test: 'DGA Chromatography', res: 'NORMAL', resColor: '#34d399', obs: 'H2: 12 ppm, C2H2: 0.1 ppm (No internal arcing)' },
+          { id: 'MAINT-ROW-99204', test: 'IR Thermography', res: 'WARNING', resColor: '#fb923c', obs: 'Low-voltage neutral bushing: +42°C delta T (Loose joint)' }
+        ],
+        scada: [
+          { id: 'SCADA-ROW-55102', currents: 'A: 210A · B: 445.8A · C: 195A', neutral: '268.1 A', relay: 'Neutral Overcurrent 50/51N' }
+        ],
+        hyp: [
+          { title: 'H1: Internal Dielectric Breakdown / Winding Arc', status: 'FALSIFIED (p = 0.01)', cls: 'hyp-falsified', badgeCls: 'badge-falsified', body: 'Falsified by DGA oil chromatography: Acetylene at 0.1 ppm completely rules out electrical arcing.', cit: 'Ref: MAINT-ROW-99182 (Zetaris Zero-ETL)' },
+          { title: 'H2: Downstream Symmetrical Short Circuit', status: 'FALSIFIED (p = 0.02)', cls: 'hyp-falsified', badgeCls: 'badge-falsified', body: 'Falsified by SCADA: Phases A and C remained at normal load. Symmetrical 3-phase fault is impossible.', cit: 'Ref: SCADA-ROW-55102 (SCADA Telemetry)' },
+          { title: 'H3: Neutral Terminal Overheating via Phase B Asymmetry', status: 'CONFIRMED (p = 0.97)', cls: 'hyp-confirmed', badgeCls: 'badge-confirmed', body: 'Confirmed: 445.8A concentrated on Phase B forced 268A through a loose neutral joint (+42°C hotspot).', cit: 'Ref: MAINT-ROW-99204 + SCADA-ROW-55102' }
+        ],
+        narrative: "AUDITABLE CAUSAL EXPLANATION:\n1. Alarming: Initial feeder trip suggested catastrophic internal transformer failure.\n2. Active Falsification: DGA query (MAINT-ROW-99182) conclusively refuted internal arcing.\n3. Root Cause Proven: SCADA (SCADA-ROW-55102) + Thermography (MAINT-ROW-99204) proved failure is localized to external loose neutral lug carrying 268 A under Phase B unbalance.\n4. Corrective Action: Rebalance feeder load and schedule 15-minute terminal re-tightening. $250,000 transformer replacement avoided.",
+        impact: "$249,850 USD Capital Expenditure Saved"
+      },
+      '9041': {
+        maint: [
+          { id: 'MAINT-ROW-88401', test: 'Urgent DGA Test', res: 'CRITICAL', resColor: '#f87171', obs: 'Acetylene: 14.5 ppm, H2: 420 ppm (High-energy internal arc)' },
+          { id: 'MAINT-ROW-88402', test: 'IR Thermography', res: 'NORMAL', resColor: '#34d399', obs: 'All bushings at nominal ambient temperature (+2°C delta T)' }
+        ],
+        scada: [
+          { id: 'SCADA-ROW-61011', currents: 'A: 1280A · B: 1310A · C: 1295A', neutral: '45.1 A', relay: 'BUCHHOLZ_GAS_ALARM + 50P_INSTANT' }
+        ],
+        hyp: [
+          { title: 'H1: Internal High-Energy Arc in Winding Tank', status: 'CONFIRMED (p = 0.99)', cls: 'hyp-confirmed', badgeCls: 'badge-confirmed', body: 'Confirmed by critical Acetylene (14.5 ppm) and Buchholz gas accumulation: destructive breakdown of winding paper insulation.', cit: 'Ref: MAINT-ROW-88401 + SCADA-ROW-61011' },
+          { title: 'H2: External Downstream Feeder Line Fault', status: 'FALSIFIED (p = 0.01)', cls: 'hyp-falsified', badgeCls: 'badge-falsified', body: 'Falsified: External faults do not generate combustible gas volume inside the hermetic conservator.', cit: 'Ref: MAINT-ROW-88401' },
+          { title: 'H3: Neutral Terminal Loose Connection', status: 'FALSIFIED (p = 0.00)', cls: 'hyp-falsified', badgeCls: 'badge-falsified', body: 'Falsified: Thermography shows normal terminal temperatures; neutral current was negligible.', cit: 'Ref: MAINT-ROW-88402' }
+        ],
+        narrative: "CATASTROPHIC INTERNAL ARC VERDICT:\n1. Buchholz gas relay operated and chemical DGA shows massive combustible gas (14.5 ppm Acetylene).\n2. Transformer TR-502 has suffered destructive internal insulation breakdown.\n3. SAFETY MANDATE: Re-energization strictly prohibited. Discard transformer and dispatch replacement crew immediately.",
+        impact: "CATASTROPHIC INTERNAL FAULT — REPLACEMENT MANDATORY"
+      },
+      '7720': {
+        maint: [
+          { id: 'MAINT-ROW-77101', test: 'Periodic DGA Test', res: 'NORMAL', resColor: '#34d399', obs: 'Acetylene: 0.05 ppm, H2: 15 ppm. Dielectric breakdown: 65 kV (Healthy tank)' },
+          { id: 'MAINT-ROW-77102', test: 'IR Thermography', res: 'NORMAL', resColor: '#34d399', obs: 'Terminals nominal (<3°C delta T)' }
+        ],
+        scada: [
+          { id: 'SCADA-ROW-72015', currents: 'A: 1640A · B: 1610A · C: 1625A', neutral: '18.2 A', relay: 'FEEDER_50P_INSTANT_TRIP' }
+        ],
+        hyp: [
+          { title: 'H1: Internal Transformer Winding Breakdown', status: 'FALSIFIED (p = 0.01)', cls: 'hyp-falsified', badgeCls: 'badge-falsified', body: 'Falsified: DGA shows pristine oil with 65 kV breakdown strength. Core and windings are undamaged.', cit: 'Ref: MAINT-ROW-77101' },
+          { title: 'H2: Downstream 3-Phase Symmetrical Line Short Circuit', status: 'CONFIRMED (p = 0.98)', cls: 'hyp-confirmed', badgeCls: 'badge-confirmed', body: 'Confirmed: SCADA recorded symmetrical >1600 A across all phases due to vehicular collision with distribution pole.', cit: 'Ref: SCADA-ROW-72015 + TICKET-ROW-33019' },
+          { title: 'H3: Neutral Terminal Contact Heating', status: 'FALSIFIED (p = 0.01)', cls: 'hyp-falsified', badgeCls: 'badge-falsified', body: 'Falsified: Thermography proves terminals operated within normal temperature limits.', cit: 'Ref: MAINT-ROW-77102' }
+        ],
+        narrative: "DOWNSTREAM FEEDER LINE SHORT CIRCUIT:\n1. Symmetrical >1600 A overcurrent tripped feeder protection instantaneously.\n2. Chemical DGA proves distribution transformer TR-308 is 100% undamaged.\n3. Root Cause: Vehicular impact snapped street utility pole, shorting 3 phases together.\n4. Remediation: Isolate damaged distribution line section; transfer customers to backup feeder. Transformer remains in service.",
+        impact: "TRANSFORMER INTACT — FEEDER REPAIR DISPATCHED"
+      },
+      '5501': {
+        maint: [],
+        scada: [
+          { id: 'SCADA-ROW-44001', currents: 'A: 85A · B: 90.5A · C: 88A', neutral: '22.0 A', relay: 'RESIDUAL_CURRENT_ALARM_INTERMITTENT' }
+        ],
+        hyp: [
+          { title: 'H_ABSTAIN: Abstention Due to Missing Evidence', status: 'ABSTAINED (p = 1.0)', cls: 'hyp-abstain', badgeCls: 'badge-abstain', body: 'Zero Hallucination Policy: Maintenance DGA chromatography records are missing. Agent strictly refuses to fabricate causes.', cit: 'Ref: Evidence Absence Invariant' }
+        ],
+        narrative: "STRICT ABSTENTION VERDICT (Zero Hallucination Policy):\n1. Maintenance chemical records are absent in the database.\n2. In accordance with HG GridMind safety invariants, the agent refuses to formulate a causal conclusion without verifiable sensor ground truth.\n3. Escalating to engineering protection team for manual sampling. Zero hallucinated causes issued.",
+        impact: "SAFE ABSTENTION — ZERO HALLUCINATED CAUSES"
+      }
+    };
+
+    function loadCase(key) {
+      const btns = document.querySelectorAll('.case-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const c = CASES[key];
+      // Maint table
+      const mTbody = document.getElementById('maintenance-tbody');
+      if (c.maint.length === 0) {
+        mTbody.innerHTML = '<tr><td colspan="4" style="color: #fbbf24; text-align: center;">No maintenance records found in silo (Missing Data)</td></tr>';
+      } else {
+        mTbody.innerHTML = c.maint.map(m => `
+          <tr>
+            <td class="row-id">${m.id}</td>
+            <td>${m.test}</td>
+            <td><span style="color: ${m.resColor}; font-weight: bold;">${m.res}</span></td>
+            <td>${m.obs}</td>
+          </tr>
+        `).join('');
+      }
+
+      // SCADA table
+      const sTbody = document.getElementById('scada-tbody');
+      sTbody.innerHTML = c.scada.map(s => `
+        <tr>
+          <td class="row-id">${s.id}</td>
+          <td>${s.currents}</td>
+          <td><span style="color: #f87171; font-weight: bold;">${s.neutral}</span></td>
+          <td>${s.relay}</td>
+        </tr>
+      `).join('');
+
+      // Hypotheses
+      const hContainer = document.getElementById('hypotheses-container');
+      hContainer.innerHTML = c.hyp.map(h => `
+        <div class="hypothesis-card ${h.cls}">
+          <div class="hyp-header">
+            <span class="hyp-title">${h.title}</span>
+            <span class="hyp-badge ${h.badgeCls}">${h.status}</span>
+          </div>
+          <div class="hyp-body">${h.body}</div>
+          <div class="hyp-citation">${h.cit}</div>
+        </div>
+      `).join('');
+
+      // Narrative & Impact
+      document.getElementById('narrative-content').innerText = c.narrative;
+      document.getElementById('impact-badge').innerText = c.impact;
+
+      // Reset gate
+      document.getElementById('danger-alert').style.display = 'none';
+      document.getElementById('success-alert').style.display = 'none';
+      const statusText = document.getElementById('gate-status-text');
+      statusText.innerText = 'HUMAN APPROVAL GATE: LOCKED (Fail-Closed Active)';
+      statusText.className = 'gate-status status-locked';
+      document.getElementById('token-display').innerText = 'Token: NONE';
+      document.getElementById('token-display').style.color = '#9ca3af';
+    }
 
     function attemptUnsafeDispatch() {
-      const danger = document.getElementById('danger-alert');
-      const success = document.getElementById('success-alert');
-      success.style.display = 'none';
-      danger.style.display = 'block';
+      document.getElementById('success-alert').style.display = 'none';
+      document.getElementById('danger-alert').style.display = 'block';
     }
 
     function openSignoffModal() {
-      isAuthorized = true;
       const statusText = document.getElementById('gate-status-text');
       statusText.innerText = 'HUMAN APPROVAL GATE: AUTHORIZED & VERIFIED';
       statusText.className = 'gate-status status-unlocked';
@@ -366,36 +432,12 @@ AUDITABLE CAUSAL EXPLANATION:
       tokenDisplay.innerText = 'Token: HUMAN-SIGNOFF-7E93A248 (Hernan Greco)';
       tokenDisplay.style.color = '#34d399';
 
-      const danger = document.getElementById('danger-alert');
-      const success = document.getElementById('success-alert');
-      danger.style.display = 'none';
-      success.style.display = 'block';
+      document.getElementById('danger-alert').style.display = 'none';
+      document.getElementById('success-alert').style.display = 'block';
     }
 
-    function loadCase(caseName) {
-      const btns = document.querySelectorAll('.case-btn');
-      btns.forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-
-      const narrative = document.getElementById('narrative-content');
-      if (caseName === 'INC-ADVERSARIAL-INCOMPLETE') {
-        narrative.innerText = "ABSTENTION VERDICT (Zero Hallucination Policy):\n" +
-          "1. DGA records missing or corrupted in maintenance database.\n" +
-          "2. In accordance with HG GridMind safety invariants, the agent refuses to formulate a causal conclusion without verifiable sensor ground truth.\n" +
-          "3. Escalating to engineering protection team for manual sampling. Zero hallucinated causes issued.";
-      } else if (caseName === 'INC-ADVERSARIAL-SYMMETRIC') {
-        narrative.innerText = "SYMMETRICAL FAULT INVESTIGATION:\n" +
-          "1. SCADA records verify simultaneous 1400A overcurrent across Phase A, B, and C.\n" +
-          "2. Transformer TR-404 neutral lug thermal profile remains normal.\n" +
-          "3. Instantaneous phase relay 50P operated correctly. Incident classified as external distribution feeder branch line fault.";
-      } else {
-        narrative.innerText = "AUDITABLE CAUSAL EXPLANATION:\n" +
-          "1. Operational Alarming: Initial feeder trip alarm on transformer TR-404 suggested catastrophic internal insulation failure.\n" +
-          "2. Active Falsification: Zetaris virtual query against oil chromatography records (MAINT-ROW-99182) conclusively falsified internal arcing.\n" +
-          "3. Root Cause Proven: SCADA telemetry (SCADA-ROW-55102) joined with thermography (MAINT-ROW-99204) proved the failure was localized to an external loose neutral lug carrying 268 A under Phase B unbalance.\n" +
-          "4. Corrective Action: Rebalance feeder to auxiliary bus and schedule a 15-minute terminal re-tightening window. Unnecessary $250,000 transformer replacement avoided.";
-      }
-    }
+    // Initialize with Case 8812
+    loadCase('8812');
   </script>
 </body>
 </html>

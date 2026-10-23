@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-2026-UTIL-5501",
+  "asset_id": "TR-102",
+  "occurred_at_utc": "2026-10-23T02:10:00Z",
+  "initial_operator_report": {
+    "observed_symptom": "Disparo intermitente por protección residual en alimentador rural R-01.",
+    "initial_hypothesis": "Sospecha preliminar no confirmada."
+  },
+  "synthetic_sources": {
+    "scada_telemetry": [
+      {
+        "row_id": "SCADA-ROW-44001",
+        "timestamp": "2026-10-23T02:09:59Z",
+        "voltage_v": 13200,
+        "current_phase_a_amps": 85.0,
+        "current_phase_b_amps": 90.5,
+        "current_phase_c_amps": 88.2,
+        "neutral_current_amps": 22.0,
+        "relay_flags": ["RESIDUAL_CURRENT_ALARM_INTERMITTENT"]
+      }
+    ],
+    "maintenance_history": [],
+    "tickets_database": []
+  }
+}

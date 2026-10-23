@@ -1,0 +1,47 @@
+{
+  "incident_id": "INC-2026-UTIL-9041",
+  "asset_id": "TR-502",
+  "occurred_at_utc": "2026-10-22T06:15:00Z",
+  "initial_operator_report": {
+    "observed_symptom": "Disparo violento de relé Buchholz y sobrecorriente instantánea 50P en transformador TR-502.",
+    "initial_hypothesis": "Sospecha de arco eléctrico interno catastrófico en devanados de alta tensión."
+  },
+  "synthetic_sources": {
+    "scada_telemetry": [
+      {
+        "row_id": "SCADA-ROW-61011",
+        "timestamp": "2026-10-22T06:14:58Z",
+        "voltage_v": 13200,
+        "current_phase_a_amps": 1280.5,
+        "current_phase_b_amps": 1310.2,
+        "current_phase_c_amps": 1295.4,
+        "neutral_current_amps": 45.1,
+        "relay_flags": ["BUCHHOLZ_GAS_ALARM", "OVERCURRENT_50P_INSTANT"]
+      }
+    ],
+    "maintenance_history": [
+      {
+        "row_id": "MAINT-ROW-88401",
+        "sample_date": "2026-10-22T07:30:00Z",
+        "action": "Ensayo DGA cromatográfico urgente post-disparo",
+        "result_status": "CRITICAL_ALARM",
+        "details": "Acetileno: 14.5 ppm (Límite crítico: 2.0 ppm), Hidrógeno: 420 ppm, Metano: 180 ppm. Diagnóstico químico: Arco eléctrico de alta energía interno en cuba de aceite."
+      },
+      {
+        "row_id": "MAINT-ROW-88402",
+        "sample_date": "2026-10-21T11:00:00Z",
+        "action": "Termografía infrarroja rutinaria",
+        "result_status": "NORMAL",
+        "details": "Bornes de neutro y fases en temperatura ambiente nominal (+2°C delta T)."
+      }
+    ],
+    "tickets_database": [
+      {
+        "row_id": "TICKET-ROW-20104",
+        "reported_at": "2026-10-22T06:16:00Z",
+        "ticket_type": "INTERRUPCION_TOTAL_SUBESTACION",
+        "description": "Apertura forzada de cabecera por gas en relé de transformador TR-502."
+      }
+    ]
+  }
+}

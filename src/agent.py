@@ -90,7 +90,7 @@ class GridMindCommander:
         incident_id = bundle.get("incident_id", "UNKNOWN")
         asset_id = bundle.get("asset_id", "UNKNOWN")
         init_rep = bundle.get("initial_report", {})
-        initial_symptom = init_rep.get("observed_symptom", "Alarma de sobrecorriente y posible falla de transformador")
+        initial_symptom = init_rep.get("observed_symptom", "Perturbación operativa en red eléctrica.")
 
         # 2. Meterless Context Layer (H-MEM timeline & World Model)
         meterless = MeterlessContextLayer(incident_id)
@@ -100,109 +100,53 @@ class GridMindCommander:
         world_model = meterless.build_world_model_graph()
         meterless_context = meterless.export_context_bundle()
 
-        # 3. Active Falsification against physical evidence
+        # 3. Dynamic Causal Evaluation via Nemotron Reasoner
+        explanation = self.nemotron.generate_causal_explanation(bundle, meterless_context)
+        hypotheses_raw = explanation.get("hypotheses_evaluated", [])
+
+        # Extract citations and falsified records
         citations: List[CausalEvidenceCitation] = []
         falsified: List[Dict[str, str]] = []
 
-        maintenance_records = bundle.get("maintenance", [])
-        dga_verified_normal = False
-        hotspot_detected = False
-
-        for m in maintenance_records:
-            action = m.get("action", "")
-            status = m.get("result_status", "")
-            row_id = m.get("row_id", "UNKNOWN")
-
-            if "DGA" in action or "cromatogr" in action:
-                if status == "NORMAL":
-                    dga_verified_normal = True
+        for h in hypotheses_raw:
+            if h.get("status") == "FALSIFIED":
+                falsified.append({
+                    "hypothesis": h.get("title", ""),
+                    "falsified_by_citation": h.get("falsification_evidence") or "Falsified by sensor constraints",
+                    "reason": h.get("physical_mechanism", ""),
+                })
+            elif h.get("status") == "CONFIRMED":
+                for cit in h.get("supporting_citations", []):
+                    table_name = "maintenance_history" if "MAINT" in cit else ("scada_telemetry" if "SCADA" in cit else "tickets_database")
                     citations.append(
                         CausalEvidenceCitation(
-                            source_table="maintenance_history",
-                            row_id=row_id,
-                            fact_observed=f"DGA químico dentro de norma ({m.get('details', '')[:40]}). Sin gases de arco ni degradación térmica interna.",
-                            supports_hypothesis=False,
-                            confidence_delta=-0.90,
+                            source_table=table_name,
+                            row_id=cit,
+                            fact_observed=f"Confirmed physical evidence: {h.get('physical_mechanism', '')[:60]}...",
+                            supports_hypothesis=True,
+                            confidence_delta=h.get("posterior_probability", 0.9),
                         )
                     )
 
-            if "Termograf" in action and status == "WARNING":
-                hotspot_detected = True
-                citations.append(
-                    CausalEvidenceCitation(
-                        source_table="maintenance_history",
-                        row_id=row_id,
-                        fact_observed=f"Termografía reporta sobretemperatura en borne de neutro (+42°C delta T) por conexión con torque insuficiente.",
-                        supports_hypothesis=True,
-                        confidence_delta=0.45,
-                    )
-                )
-
-        if dga_verified_normal:
-            falsified.append({
-                "hypothesis": "H1: Falla interna de aislamiento / degradación dieléctrica de bobinados en cuba",
-                "falsified_by_citation": "MAINT-ROW-99182 (Ensayo DGA)",
-                "reason": "La concentración de acetileno (0.1 ppm) y metano descarta de forma concluyente arcos internos o quema de papel aislante.",
-            })
-
-        # Evaluate SCADA telemetry
-        scada_records = bundle.get("scada", [])
-        severe_unbalance = False
-        symmetric_short_circuit = False
-
-        for s in scada_records:
-            ia = s.get("current_phase_a_amps", 0)
-            ib = s.get("current_phase_b_amps", 0)
-            ic = s.get("current_phase_c_amps", 0)
-            in_curr = s.get("neutral_current_amps", 0)
-            row_id = s.get("row_id", "UNKNOWN")
-
-            if ib > (ia * 1.8) and in_curr > 200:
-                severe_unbalance = True
+        # In case no citations were built from confirmed (e.g. abstention), map evaluated rows
+        if not citations:
+            for s in bundle.get("scada", []):
                 citations.append(
                     CausalEvidenceCitation(
                         source_table="scada_telemetry",
-                        row_id=row_id,
-                        fact_observed=f"Desbalance severo en alimentador: Fase B={ib}A vs Fase A={ia}A / C={ic}A. Retorno por neutro={in_curr}A.",
-                        supports_hypothesis=True,
-                        confidence_delta=0.50,
+                        row_id=s.get("row_id", "UNKNOWN"),
+                        fact_observed=f"SCADA current/voltage evaluated: relay flags={s.get('relay_flags')}",
+                        supports_hypothesis=False,
+                        confidence_delta=0.0,
                     )
                 )
 
-            if ia > 1000 and ib > 1000 and ic > 1000:
-                symmetric_short_circuit = True
+        confirmed_cause = explanation["confirmed_cause"]
+        verdict = explanation["verdict_code"]
+        narrative = explanation["narrative_explanation"]
+        remediation = explanation["recommended_action"]
 
-        if not symmetric_short_circuit:
-            falsified.append({
-                "hypothesis": "H2: Cortocircuito trifásico franco simétrico aguas abajo en red de distribución",
-                "falsified_by_citation": "SCADA-ROW-55102 (Telemetría de corriente por fase)",
-                "reason": "Fases A y C permanecieron en valores de carga nominales (210.4A y 198.7A). La perturbación fue estrictamente asimétrica.",
-            })
-
-        # 4. Synthesize NVIDIA Nemotron Causal Verdict
-        hypotheses = self.nemotron.formulate_competing_hypotheses()
-        explanation = self.nemotron.generate_causal_explanation(hypotheses, bundle, meterless_context)
-
-        if hotspot_detected and severe_unbalance and dga_verified_normal:
-            confirmed_cause = (
-                "Sobrecarga térmica destructiva en borne de neutro de baja tensión de TR-404, "
-                "provocada por la coincidencia física de un marcado desbalance de carga en Fase B (445.8 A) "
-                "con una resistencia de contacto elevada preexistente en el terminal de conexión."
-            )
-            narrative = explanation["narrative_explanation"]
-            remediation = (
-                "Acción Correctiva Recomendada: Transferir alimentador B-12 a barra auxiliar de reserva "
-                "y coordinar una ventana de parada técnica de 15 minutos para reapriete mecánico del borne de neutro a 45 Nm. "
-                "Se descarta y cancela la orden de recambio de transformador ($249,850 USD ahorrados)."
-            )
-            verdict = "REJECTED_AS_FALSE_CORRELATION"
-        else:
-            confirmed_cause = "Causa Indeterminada — Abstención rigurosa por insuficiencia de evidencia física."
-            narrative = "El agente se abstiene de diagnosticar para prevenir alucinaciones operativas."
-            remediation = "Solicitar inspección presencial y muestreo analítico adicional."
-            verdict = "ABSTENTION_INSUFFICIENT_EVIDENCE"
-
-        # 5. Cryptographic Audit ACK (HG-GRIDMIND-ACK-V1)
+        # 4. Cryptographic Audit ACK (HG-GRIDMIND-ACK-V1)
         raw_seed = f"{incident_id}:{asset_id}:{confirmed_cause}:{time.time()}"
         ack_hash = hashlib.sha256(raw_seed.encode("utf-8")).hexdigest()
 
@@ -211,8 +155,9 @@ class GridMindCommander:
             "meterless": meterless_context,
             "nemotron": {
                 "model": self.nemotron.model_name,
+                "execution_mode": explanation.get("execution_mode"),
                 "cost_usd": self.nemotron.cost_usd,
-                "reasoning_steps": explanation["reasoning_steps"],
+                "reasoning_steps": explanation.get("reasoning_steps", 4),
             },
             "cursor": self.cursor_audit.to_dict(),
         }

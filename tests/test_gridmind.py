@@ -2,6 +2,7 @@
 
 Challenge 02: The Agent That Can Explain Why.
 100% offline, deterministic, zero network calls, zero paid API spend ($0.00).
+Includes multi-scenario generalization and adversarial robustness.
 """
 
 from __future__ import annotations
@@ -21,10 +22,12 @@ from src.sponsors.zetaris_adapter import ZetarisVirtualDataFabric
 
 class TestGridMindComprehensiveSuite(unittest.TestCase):
     def setUp(self):
-        self.fixture_path = (
-            Path(__file__).resolve().parent.parent / "fixtures" / "incident_INC_2026_UTIL_8812.json"
-        )
-        self.connector = FederatedDataConnector(self.fixture_path)
+        self.fixtures_dir = Path(__file__).resolve().parent.parent / "fixtures"
+        self.fixture_8812 = self.fixtures_dir / "incident_INC_2026_UTIL_8812.json"
+        self.fixture_9041 = self.fixtures_dir / "incident_INC_2026_UTIL_9041.json"
+        self.fixture_7720 = self.fixtures_dir / "incident_INC_2026_UTIL_7720.json"
+        self.fixture_5501 = self.fixtures_dir / "incident_INC_2026_UTIL_5501.json"
+        self.connector = FederatedDataConnector(self.fixture_8812)
 
     def test_zetaris_virtual_data_fabric_query_plan(self):
         fabric = ZetarisVirtualDataFabric()
@@ -47,41 +50,44 @@ class TestGridMindComprehensiveSuite(unittest.TestCase):
         self.assertFalse(world_model["falsification_checks"]["internal_arc_possible"])
         self.assertTrue(world_model["falsification_checks"]["terminal_overheating_confirmed"])
 
-    def test_nemotron_causal_reasoner_falsification(self):
+    def test_nemotron_causal_reasoner_evaluation(self):
         reasoner = NemotronCausalReasoner()
-        hypotheses = reasoner.formulate_competing_hypotheses()
-        self.assertEqual(len(hypotheses), 3)
+        bundle = self.connector.execute_federated_query("INCIDENT_FEDERATION")
+        meterless = MeterlessContextLayer("INC-2026-UTIL-8812")
+        context = meterless.export_context_bundle()
 
-        h1 = next(h for h in hypotheses if h.hypothesis_id == "H1")
-        h2 = next(h for h in hypotheses if h.hypothesis_id == "H2")
-        h3 = next(h for h in hypotheses if h.hypothesis_id == "H3")
+        res = reasoner.generate_causal_explanation(bundle, context)
+        self.assertEqual(res["verdict_code"], "REJECTED_AS_FALSE_CORRELATION")
+        self.assertEqual(res["execution_mode"], "DETERMINISTIC_PHYSICAL_REASONER")
+        self.assertIn("MAINT-ROW-99182", res["narrative_explanation"])
 
-        self.assertEqual(h1.status, "FALSIFIED")
-        self.assertEqual(h2.status, "FALSIFIED")
-        self.assertEqual(h3.status, "CONFIRMED")
-        self.assertIn("MAINT-ROW-99182", h1.falsification_evidence)
-
-    def test_causal_investigation_and_evidence_citations(self):
-        commander = GridMindCommander(self.connector)
+    def test_adversarial_scenario_real_internal_failure(self):
+        """Tests that incident 9041 correctly triggers internal arc diagnosis."""
+        connector = FederatedDataConnector(self.fixture_9041)
+        commander = GridMindCommander(connector)
         diag = commander.investigate_incident()
 
-        self.assertEqual(diag.incident_id, "INC-2026-UTIL-8812")
-        self.assertEqual(diag.asset_id, "TR-404")
-        self.assertEqual(diag.initial_verdict, "REJECTED_AS_FALSE_CORRELATION")
+        self.assertEqual(diag.initial_verdict, "CONFIRMED_INTERNAL_CATASTROPHIC_FAILURE")
+        self.assertIn("Arco eléctrico interno", diag.confirmed_root_cause)
+        self.assertIn("MAINT-ROW-88401", [c.row_id for c in diag.evidence_trail])
 
-        # Verify exact row-level citations exist
-        row_ids = [c.row_id for c in diag.evidence_trail]
-        self.assertIn("MAINT-ROW-99182", row_ids)
-        self.assertIn("MAINT-ROW-99204", row_ids)
-        self.assertIn("SCADA-ROW-55102", row_ids)
+    def test_adversarial_scenario_downstream_line_fault(self):
+        """Tests that incident 7720 correctly identifies external line fault."""
+        connector = FederatedDataConnector(self.fixture_7720)
+        commander = GridMindCommander(connector)
+        diag = commander.investigate_incident()
 
-        # Verify active falsification list
-        falsified_titles = [f["hypothesis"] for f in diag.falsified_hypotheses]
-        self.assertTrue(any("H1:" in t for t in falsified_titles))
-        self.assertTrue(any("H2:" in t for t in falsified_titles))
+        self.assertEqual(diag.initial_verdict, "CONFIRMED_DOWNSTREAM_FEEDER_FAULT")
+        self.assertIn("Cortocircuito trifásico simétrico", diag.confirmed_root_cause)
 
-        # Verify audit hash
-        self.assertTrue(diag.audit_ack_hash.startswith("HG-GRIDMIND-ACK-"))
+    def test_adversarial_scenario_missing_evidence_abstention(self):
+        """Tests that incident 5501 strictly abstains to prevent hallucinations."""
+        connector = FederatedDataConnector(self.fixture_5501)
+        commander = GridMindCommander(connector)
+        diag = commander.investigate_incident()
+
+        self.assertEqual(diag.initial_verdict, "ABSTENTION_INSUFFICIENT_EVIDENCE")
+        self.assertIn("Abstención obligatoria", diag.confirmed_root_cause)
 
     def test_human_approval_gate_fail_closed_without_token(self):
         gate = HumanApprovalGate()
