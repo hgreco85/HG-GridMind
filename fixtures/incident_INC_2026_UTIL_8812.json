@@ -1,0 +1,66 @@
+{
+  "incident_id": "INC-2026-UTIL-8812",
+  "facility": "Subestación Norte - Distribución Media Tensión",
+  "asset_id": "TR-404",
+  "asset_type": "Transformador de Distribución 13.2 kV / 380 V",
+  "initial_operator_report": {
+    "timestamp_utc": "2026-10-20T14:15:00Z",
+    "reporter": "Operador Sala de Control",
+    "observed_symptom": "Disparos sucesivos de protección térmica en alimentador secundario B-12. Sospecha inicial: degradación interna de dieléctrico por sobrecalentamiento de aceite."
+  },
+  "synthetic_sources": {
+    "tickets_database": [
+      {
+        "ticket_id": "TCK-8812-A",
+        "timestamp_utc": "2026-10-20T13:45:00Z",
+        "category": "Interrupción no programada",
+        "description": "Corte de servicio en 4 manzanas comerciales. Alarma de sobrecorriente instantánea.",
+        "status": "OPEN"
+      },
+      {
+        "ticket_id": "TCK-8812-B",
+        "timestamp_utc": "2026-10-20T14:02:00Z",
+        "category": "Reiteración de falla",
+        "description": "Reenganche fallido a los 10 minutos. Operador reporta posible humo en cuba de TR-404.",
+        "status": "IN_PROGRESS"
+      }
+    ],
+    "maintenance_history": [
+      {
+        "inspection_id": "INS-7721",
+        "date": "2026-10-18",
+        "technician": "Cuadrilla M-04",
+        "action": "Análisis cromatográfico de gases disueltos (DGA) en aceite mineral TR-404",
+        "result_status": "NORMAL",
+        "details": "Hidrógeno: 12 ppm (límite 100), Acetileno: 0.1 ppm (límite 2), Metano: 8 ppm (límite 120). Sin degradación térmica de celulosa ni arco eléctrico.",
+        "row_id": "MAINT-ROW-99182"
+      },
+      {
+        "inspection_id": "INS-7735",
+        "date": "2026-10-19",
+        "technician": "Cuadrilla M-09",
+        "action": "Termografía infrarroja en bornes y bornes de neutro",
+        "result_status": "WARNING",
+        "details": "Punto caliente detectado en borne de neutro de baja tensión (delta T = 42°C sobre ambiente). Conexión floja en borne N-Sec.",
+        "row_id": "MAINT-ROW-99204"
+      }
+    ],
+    "scada_telemetry": [
+      {
+        "sample_id": "SCADA-8812-1",
+        "timestamp_utc": "2026-10-20T14:14:50Z",
+        "current_phase_a_amps": 210.4,
+        "current_phase_b_amps": 445.8,
+        "current_phase_c_amps": 195.2,
+        "neutral_current_amps": 268.1,
+        "oil_temperature_celsius": 52.3,
+        "row_id": "SCADA-ROW-55102"
+      }
+    ]
+  },
+  "ground_truth_verdict": {
+    "rejected_hypothesis": "Falla interna de aislamiento de aceite (DGA 2026-10-18 demuestra normalidad)",
+    "confirmed_root_cause": "Sobrecarga severa de neutro generada por desbalance de fase B combinado con borne flojo detectado en termografía INS-7735",
+    "recommended_action": "Secuenciar maniobra de transferencia de carga de Fase B hacia alimentador de reserva y reapriete de borne N-Sec con desenergización programada de 15 minutos."
+  }
+}
