@@ -24,6 +24,34 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 
+def _safe_str(val: Any) -> str:
+    """Coerces any value to string without crashing on None or non-string types."""
+    if val is None:
+        return ""
+    return str(val)
+
+
+def _safe_float(val: Any, default: float = 0.0) -> float:
+    """Coerces numeric values and string representations to float without crashing."""
+    if val is None:
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def _safe_list(val: Any) -> List[Any]:
+    """Ensures input is returned as a list."""
+    if val is None:
+        return []
+    if isinstance(val, list):
+        return val
+    if isinstance(val, (tuple, set)):
+        return list(val)
+    return [val]
+
+
 @dataclass
 class CausalHypothesis:
     hypothesis_id: str
@@ -56,15 +84,25 @@ class NemotronCausalReasoner:
         bundle: Dict[str, Any],
         meterless_context: Dict[str, Any],
     ) -> Tuple[List[CausalHypothesis], str, str, str, str]:
-        """Evaluates physical invariants across Zetaris-federated tables.
+        """Evaluates physical invariants across Zetaris-federated tables with defensive null safety.
         
         Returns:
             (hypotheses_list, verdict_code, confirmed_root_cause, narrative, recommended_action)
         """
+        if not isinstance(bundle, dict):
+            bundle = {}
+
         sources = bundle.get("synthetic_sources", {})
-        scada_rows = bundle.get("scada", sources.get("scada_telemetry", []))
-        maint_rows = bundle.get("maintenance", sources.get("maintenance_history", []))
-        ticket_rows = bundle.get("tickets", sources.get("tickets_database", []))
+        if not isinstance(sources, dict):
+            sources = {}
+
+        raw_scada = bundle.get("scada", sources.get("scada_telemetry", []))
+        raw_maint = bundle.get("maintenance", sources.get("maintenance_history", []))
+        raw_tickets = bundle.get("tickets", sources.get("tickets_database", []))
+
+        scada_rows = [r for r in _safe_list(raw_scada) if isinstance(r, dict)]
+        maint_rows = [r for r in _safe_list(raw_maint) if isinstance(r, dict)]
+        ticket_rows = [r for r in _safe_list(raw_tickets) if isinstance(r, dict)]
 
         # Check for data completeness
         if not scada_rows or not maint_rows:
@@ -75,7 +113,7 @@ class NemotronCausalReasoner:
                 posterior_probability=1.0,
                 status="ABSTAINED",
                 falsification_evidence=None,
-                supporting_citations=[r.get("row_id", "UNKNOWN") for r in scada_rows],
+                supporting_citations=[_safe_str(r.get("row_id") or "UNKNOWN") for r in scada_rows],
                 physical_mechanism="Telemetry or chemical maintenance records are missing. In accordance with zero-hallucination policy, causal diagnosis is refused.",
             )
             return (
@@ -95,23 +133,25 @@ class NemotronCausalReasoner:
         dga_citation = "NONE"
         dga_details = ""
         for m in maint_rows:
-            action = m.get("action", "")
-            if "DGA" in action or "cromatogr" in action:
-                dga_citation = m.get("row_id", "MAINT-UNKNOWN")
-                dga_details = m.get("details", "")
-                if m.get("result_status") in ("CRITICAL_ALARM", "CRITICAL"):
+            action = _safe_str(m.get("action"))
+            res_status = _safe_str(m.get("result_status"))
+            if "dga" in action.lower() or "cromatogr" in action.lower():
+                dga_citation = _safe_str(m.get("row_id") or "MAINT-UNKNOWN")
+                dga_details = _safe_str(m.get("details"))
+                if res_status in ("CRITICAL_ALARM", "CRITICAL"):
                     dga_critical_arc = True
-                elif m.get("result_status") == "NORMAL":
+                elif res_status == "NORMAL":
                     dga_normal = True
 
         # 2. Analyze Thermography
         hotspot_neutral = False
         hotspot_citation = "NONE"
         for m in maint_rows:
-            action = m.get("action", "")
-            if "Termograf" in action and m.get("result_status") == "WARNING":
+            action = _safe_str(m.get("action"))
+            res_status = _safe_str(m.get("result_status"))
+            if "termograf" in action.lower() and res_status == "WARNING":
                 hotspot_neutral = True
-                hotspot_citation = m.get("row_id", "MAINT-UNKNOWN")
+                hotspot_citation = _safe_str(m.get("row_id") or "MAINT-UNKNOWN")
 
         # 3. Analyze SCADA Telemetry
         scada_citation = "NONE"
@@ -121,12 +161,12 @@ class NemotronCausalReasoner:
         feeder_trip = False
 
         for s in scada_rows:
-            scada_citation = s.get("row_id", "SCADA-UNKNOWN")
-            ia = s.get("current_phase_a_amps", 0)
-            ib = s.get("current_phase_b_amps", 0)
-            ic = s.get("current_phase_c_amps", 0)
-            in_curr = s.get("neutral_current_amps", 0)
-            flags = s.get("relay_flags", [])
+            scada_citation = _safe_str(s.get("row_id") or "SCADA-UNKNOWN")
+            ia = _safe_float(s.get("current_phase_a_amps"))
+            ib = _safe_float(s.get("current_phase_b_amps"))
+            ic = _safe_float(s.get("current_phase_c_amps"))
+            in_curr = _safe_float(s.get("neutral_current_amps"))
+            flags = [_safe_str(f) for f in _safe_list(s.get("relay_flags"))]
 
             if any("BUCHHOLZ" in f for f in flags):
                 buchholz_trip = True
@@ -313,7 +353,6 @@ class NemotronCausalReasoner:
         # Try live inference if configured and reachable
         if self.use_live_inference and self.endpoint_url:
             try:
-                # Example: Ollama or OpenAI compatible call
                 prompt = (
                     f"Synthesize causal explanation for incident {bundle.get('incident_id')}:\n"
                     f"Physical findings: {confirmed_cause}\n"
@@ -335,7 +374,6 @@ class NemotronCausalReasoner:
                         llm_response_text = res_json.get("response") or res_json.get("choices", [{}])[0].get("text", "")
                         execution_mode = "LIVE_LLM_INFERENCE"
             except Exception:
-                # Safe fallback to deterministic physical engine
                 execution_mode = "DETERMINISTIC_PHYSICAL_REASONER"
 
         return {
@@ -348,5 +386,4 @@ class NemotronCausalReasoner:
             "narrative_explanation": llm_response_text or narrative,
             "recommended_action": remediation,
             "cost_usd": self.cost_usd,
-            "safety_spend_limit_respected": True,
         }

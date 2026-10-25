@@ -93,7 +93,7 @@ class GridMindCommander:
         initial_symptom = init_rep.get("observed_symptom", "Perturbación operativa en red eléctrica.")
 
         # 2. Meterless Context Layer (H-MEM timeline & World Model)
-        meterless = MeterlessContextLayer(incident_id)
+        meterless = MeterlessContextLayer(incident_id, asset_id=asset_id)
         raw_events = bundle.get("maintenance", []) + bundle.get("scada", []) + bundle.get("tickets", [])
         meterless.ingest_h_mem_timeline(raw_events)
         meterless.compute_markovian_transitions()
@@ -104,9 +104,10 @@ class GridMindCommander:
         explanation = self.nemotron.generate_causal_explanation(bundle, meterless_context)
         hypotheses_raw = explanation.get("hypotheses_evaluated", [])
 
-        # Extract citations and falsified records
+        # Extract citations and falsified records with deduplication
         citations: List[CausalEvidenceCitation] = []
         falsified: List[Dict[str, str]] = []
+        seen_citations = set()
 
         for h in hypotheses_raw:
             if h.get("status") == "FALSIFIED":
@@ -118,6 +119,10 @@ class GridMindCommander:
             elif h.get("status") == "CONFIRMED":
                 for cit in h.get("supporting_citations", []):
                     table_name = "maintenance_history" if "MAINT" in cit else ("scada_telemetry" if "SCADA" in cit else "tickets_database")
+                    cit_key = (table_name, cit)
+                    if cit_key in seen_citations:
+                        continue
+                    seen_citations.add(cit_key)
                     citations.append(
                         CausalEvidenceCitation(
                             source_table=table_name,
@@ -131,10 +136,17 @@ class GridMindCommander:
         # In case no citations were built from confirmed (e.g. abstention), map evaluated rows
         if not citations:
             for s in bundle.get("scada", []):
+                if not isinstance(s, dict):
+                    continue
+                row_id = str(s.get("row_id") or "UNKNOWN")
+                cit_key = ("scada_telemetry", row_id)
+                if cit_key in seen_citations:
+                    continue
+                seen_citations.add(cit_key)
                 citations.append(
                     CausalEvidenceCitation(
                         source_table="scada_telemetry",
-                        row_id=s.get("row_id", "UNKNOWN"),
+                        row_id=row_id,
                         fact_observed=f"SCADA current/voltage evaluated: relay flags={s.get('relay_flags')}",
                         supports_hypothesis=False,
                         confidence_delta=0.0,
