@@ -72,9 +72,11 @@ class ZetarisVirtualDataFabric:
     def __init__(self, endpoint_url: Optional[str] = None, api_key: Optional[str] = None):
         self.endpoint_url = endpoint_url or "zetaris://local.virtual.engine:10000"
         self.api_key = api_key or "FREE_TIER_OR_LOCAL_VIRTUAL"
-        self.is_cloud_connected = bool(endpoint_url and "zetarishackathon.azurecr.io" in endpoint_url)
-        # Cloud gateway is blocked because hackathon organizer never provisioned azurecr credentials
-        self.cloud_status = "CONNECTED" if self.is_cloud_connected else "BLOCKED_ORGANIZER_REGISTRY_PENDING_TBC"
+        # A configured endpoint is not evidence of an authenticated live connection.
+        # This adapter only implements local SQLite. Fail closed until an actual
+        # provider request/response is implemented and independently verified.
+        self.is_cloud_connected = False
+        self.cloud_status = "BLOCKED_NO_VERIFIED_PROVIDER_CONNECTION"
 
     def explain_query_plan(self, query_intent: str) -> Dict[str, Any]:
         """Returns the explainable virtual query plan detailing data sources in place."""
