@@ -86,6 +86,9 @@ class ZetarisVirtualDataFabric:
             "engine": "Zetaris Lightning SQL Engine",
             "execution_mode": "CLOUD" if self.is_cloud_connected else "LOCAL_VIRTUAL_FEDERATION",
             "cloud_status": self.cloud_status,
+            "zetaris_cloud_gateway": "BLOCKED_ORGANIZER_REGISTRY_PENDING_TBC",
+            "local_backend_provider": "SQLite In-Memory (Local Simulation - Not Genuine Zetaris Cluster)",
+            "disclosure": "Genuine Zetaris requires remote gateway or AzureCR registry access, which was not provisioned. Query execution is simulated locally using SQLite in-memory tables without data movement.",
             "sql": contract.lightning_sql,
             "target_tables": list(contract.target_tables),
             "data_movement_required": False,
@@ -222,6 +225,8 @@ class ZetarisVirtualDataFabric:
         return {
             "execution_plan": plan,
             "sql_execution_metrics": {
+                "engine_backend": "SQLite in-memory simulation (NOT genuine Zetaris server)",
+                "zetaris_cloud_gateway": "BLOCKED_ORGANIZER_REGISTRY_PENDING_TBC",
                 "latency_ms": execution_latency_ms,
                 "sql_rows_retrieved": len(rows_returned),
                 "virtual_tables_queried": plan["target_tables"],
