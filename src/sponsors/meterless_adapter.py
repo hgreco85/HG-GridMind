@@ -15,10 +15,19 @@ Completely local-first, deterministic, $0.00 USD spend.
 
 from __future__ import annotations
 
+import json
 import math
+import os
 import re
+import subprocess
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+
+class MeterlessBridgeDisconnectedError(RuntimeError):
+    """Raised when the official Meterless TypeScript engine bridge is disconnected or fails."""
+    pass
 
 
 @dataclass
@@ -62,6 +71,7 @@ class MeterlessContextLayer:
         self.state_transitions: List[OperationalState] = []
         self.world_model_assertions: Dict[str, Any] = {}
         self.chunk_config = ChunkConfig()
+        self.official_bridge_result: Optional[Dict[str, Any]] = None
 
     @staticmethod
     def _extract_safe_timestamp(event: Dict[str, Any]) -> str:
@@ -332,6 +342,73 @@ class MeterlessContextLayer:
         self.world_model_assertions = graph
         return graph
 
+    def execute_official_engine_bridge(
+        self,
+        bundle_data: Dict[str, Any],
+        require_official_bridge: bool = False,
+        bridge_script_path: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Invokes the official Meterless TypeScript engines (HMEM, WorldModel, Markovian) via bridge.ts.
+
+        If require_official_bridge is True and the bridge cannot be executed or fails,
+        raises MeterlessBridgeDisconnectedError.
+        """
+        if bridge_script_path is None:
+            repo_root = Path(__file__).resolve().parent.parent.parent
+            candidate = repo_root / "engines" / "meterless" / "bridge.ts"
+            bridge_script_path = str(candidate)
+
+        if not os.path.exists(bridge_script_path):
+            if require_official_bridge:
+                raise MeterlessBridgeDisconnectedError(
+                    f"Official Meterless engine bridge not found at: {bridge_script_path}"
+                )
+            return None
+
+        payload = {
+            "incident_id": self.incident_id,
+            "asset_id": self.asset_id,
+            "symptom": bundle_data.get("initial_report", {}).get("observed_symptom")
+            or bundle_data.get("initial_operator_report", {}).get("observed_symptom")
+            or "Operational anomaly in electrical asset",
+            "maintenance": bundle_data.get("maintenance")
+            or bundle_data.get("synthetic_sources", {}).get("maintenance_history", []),
+            "scada": bundle_data.get("scada")
+            or bundle_data.get("synthetic_sources", {}).get("scada_telemetry", []),
+            "tickets": bundle_data.get("tickets")
+            or bundle_data.get("synthetic_sources", {}).get("tickets_database", []),
+        }
+
+        try:
+            cmd = ["npx", "tsx", bridge_script_path]
+            use_shell = os.name == "nt"
+            res = subprocess.run(
+                cmd,
+                input=json.dumps(payload),
+                capture_output=True,
+                text=True,
+                timeout=20,
+                shell=use_shell,
+            )
+            if res.returncode != 0:
+                if require_official_bridge:
+                    raise MeterlessBridgeDisconnectedError(
+                        f"Official Meterless engine bridge failed with exit code {res.returncode}: {res.stderr.strip()}"
+                    )
+                return None
+
+            result = json.loads(res.stdout.strip())
+            self.official_bridge_result = result
+            return result
+        except Exception as exc:
+            if require_official_bridge:
+                if isinstance(exc, MeterlessBridgeDisconnectedError):
+                    raise
+                raise MeterlessBridgeDisconnectedError(
+                    f"Official Meterless engine execution failed: {exc}"
+                ) from exc
+            return None
+
     def export_context_bundle(self) -> Dict[str, Any]:
         """Exports unified Meterless context complying with Meterless spec."""
         carryover_block = (
@@ -340,7 +417,7 @@ class MeterlessContextLayer:
             f"DECISIONS: Mapped {len(self.state_transitions)} operational states with Markovian progression.\n"
             f"CONTEXT: Asset {self.asset_id} under incident {self.incident_id}."
         )
-        return {
+        bundle: Dict[str, Any] = {
             "meterless_engine": "Meterless Open Core Reference Implementation (Apache 2.0)",
             "chunk_config": {
                 "chunk_size": self.chunk_config.chunk_size,
@@ -359,3 +436,6 @@ class MeterlessContextLayer:
             "world_model": self.world_model_assertions,
             "cost_usd": 0.0,
         }
+        if self.official_bridge_result is not None:
+            bundle["official_bridge"] = self.official_bridge_result
+        return bundle

@@ -36,9 +36,11 @@
       "role": "Local-First Context Layer Protocol (H-MEM, Markovian, World Model)",
       "implementation_files": [
         "src/sponsors/meterless_adapter.py",
+        "engines/meterless/bridge.ts",
         "engines/meterless/hmem/",
         "engines/meterless/markovian/",
-        "engines/meterless/world-model/"
+        "engines/meterless/world-model/",
+        "tests/test_meterless_e2e_real.py"
       ],
       "engines_utilized": [
         "H-MEM (Hierarchical Chronological Memory with Tiered Storage & Provenance)",
@@ -47,6 +49,7 @@
       ],
       "open_source_reference": "github.com/Meterless/Meterless (Apache 2.0)",
       "official_conformance_checks": "29/29 PASS (13/13 H-MEM, 8/8 Markovian, 8/8 World Model)",
+      "e2e_real_integration": "LIVE_VERIFIED: E2E main flow invocation + deliberate disconnection failure test verified",
       "offline_deterministic": true
     },
     "nvidia_nemotron": {
@@ -71,8 +74,9 @@
     }
   },
   "benchmarks": {
-    "unit_tests": "21/21 tests PASS in 0.10s (8 deep adversarial + 9 core + 4 Meterless)",
+    "unit_tests": "23/23 tests PASS (8 deep adversarial + 9 core + 4 Meterless + 2 E2E & deliberate failure)",
     "official_meterless_conformance": "29/29 checks PASS in 3.9s (13 H-MEM, 8 Markovian, 8 World Model)",
+    "e2e_meterless_integration": "2/2 PASS (Live bridge on INC_9933 + deliberate disconnection fail-closed test)",
     "adversarial_benchmark": "24/24 scenarios PASS in 0.10s (4 anchor topologies + 20 continuous parametric variations)"
   },
   "safety_invariants": {

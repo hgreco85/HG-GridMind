@@ -1,0 +1,62 @@
+{
+  "incident_id": "INC-2026-UTIL-9933",
+  "facility": "Subestación Parque Solar y Distribución Sur",
+  "asset_id": "TR-505",
+  "asset_type": "Transformador de Potencia 13.2 kV / 33 kV 2500 kVA",
+  "occurred_at_utc": "2026-10-24T16:20:00Z",
+  "initial_operator_report": {
+    "timestamp_utc": "2026-10-24T16:21:00Z",
+    "reporter": "Despachador Centro de Control Operativo Sur",
+    "observed_symptom": "Disparo intempestivo de alimentador secundario PV-04. Sospecha preliminar: degradación dieléctrica interna de transformador por inyección fotovoltaica."
+  },
+  "synthetic_sources": {
+    "tickets_database": [
+      {
+        "ticket_id": "TCK-9933-A",
+        "timestamp_utc": "2026-10-24T16:20:15Z",
+        "category": "Interrupción de generación renovable",
+        "description": "Apertura intempestiva del interruptor cabecera PV-04 afectando 12 MW de inyección solar.",
+        "status": "OPEN"
+      }
+    ],
+    "maintenance_history": [
+      {
+        "inspection_id": "INS-8801",
+        "date": "2026-10-22",
+        "technician": "Cuadrilla Especializada C-02",
+        "action": "Análisis cromatográfico de gases disueltos (DGA) en aceite mineral TR-505",
+        "result_status": "NORMAL",
+        "details": "Hidrógeno: 14 ppm (límite 100), Acetileno: 0.08 ppm (límite 2), Metano: 6 ppm (límite 120). Sin degradación térmica de celulosa ni arco eléctrico.",
+        "row_id": "MAINT-ROW-88019"
+      },
+      {
+        "inspection_id": "INS-8815",
+        "date": "2026-10-23",
+        "technician": "Cuadrilla Termográfica T-01",
+        "action": "Termografía infrarroja en bornes de potencia y neutro",
+        "result_status": "WARNING",
+        "details": "Punto caliente detectado en borne de neutro de baja tensión (delta T = 48°C sobre ambiente). Terminal flojo en empalme N-Baja.",
+        "row_id": "MAINT-ROW-88155"
+      }
+    ],
+    "scada_telemetry": [
+      {
+        "sample_id": "SCADA-9933-1",
+        "timestamp_utc": "2026-10-24T16:19:58Z",
+        "current_phase_a_amps": 215.3,
+        "current_phase_b_amps": 482.1,
+        "current_phase_c_amps": 204.8,
+        "neutral_current_amps": 286.4,
+        "voltage_v": 13200,
+        "oil_temperature_celsius": 54.1,
+        "relay_flags": ["NEUTRAL_50_51N_OVERCURRENT"],
+        "row_id": "SCADA-ROW-77109"
+      }
+    ]
+  },
+  "ground_truth_verdict": {
+    "rejected_hypothesis": "Degradación interna de aislamiento por armónicos (DGA refuta gases combustibles)",
+    "confirmed_root_cause": "Sobrecarga térmica destructiva en borne de neutro por desbalance severo de Fase B combinado con borne flojo preexistente",
+    "recommended_action": "Maniobra de reconfiguración de barras y reapriete del borne de neutro N-Baja a 45 Nm. Cancelar reemplazo del transformador ($250,000 USD ahorrados)."
+  }
+}

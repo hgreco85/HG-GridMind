@@ -90,6 +90,10 @@ def run_investigation(fixture_path: Path, signoff: bool = False, operator_name: 
 
     print(f"\n[8] Cryptographic Audit Trail:")
     print(f"    ACK Hash: {diag.audit_ack_hash}")
+    meterless_meta = diag.sponsor_metadata.get("meterless", {})
+    if "official_bridge" in meterless_meta:
+        ob = meterless_meta["official_bridge"]
+        print(f"    Meterless Engine: H-MEM ({ob['hmem']['records_ingested']} records) | WorldModel ({ob['world_model']['audit_events_count']} events) | Markovian ({ob['markovian']['chunks_evaluated']} chunks, {ob['markovian']['status']})")
     print(f"    Sponsor Tech Score: Zetaris (PASS) | Meterless (PASS) | Nemotron (PASS) | Cursor (PASS)")
     print(f"    Incremental Cost: $0.00 USD (Verified)")
     print("=" * 80)

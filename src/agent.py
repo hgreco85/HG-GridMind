@@ -77,11 +77,13 @@ class GridMindCommander:
         connector: FederatedDataConnector,
         approval_gate: Optional[HumanApprovalGate] = None,
         nemotron_engine: Optional[NemotronCausalReasoner] = None,
+        require_meterless_bridge: bool = False,
     ):
         self.connector = connector
         self.approval_gate = approval_gate or HumanApprovalGate()
         self.nemotron = nemotron_engine or NemotronCausalReasoner()
         self.cursor_audit = CursorEnvironmentAudit()
+        self.require_meterless_bridge = require_meterless_bridge
 
     def investigate_incident(self) -> IncidentDiagnosis:
         """Executes the full multi-step investigative cycle with active falsification."""
@@ -98,6 +100,12 @@ class GridMindCommander:
         meterless.ingest_h_mem_timeline(raw_events)
         meterless.compute_markovian_transitions()
         world_model = meterless.build_world_model_graph()
+
+        # Invoke official Meterless TypeScript reference engine bridge
+        meterless.execute_official_engine_bridge(
+            bundle,
+            require_official_bridge=self.require_meterless_bridge,
+        )
         meterless_context = meterless.export_context_bundle()
 
         # 3. Dynamic Causal Evaluation via Nemotron Reasoner
