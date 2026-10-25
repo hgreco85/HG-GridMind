@@ -9,11 +9,11 @@ Evaluates the autonomous agent across:
    - INC_5501: Missing maintenance & chemical data (Strict abstention).
 
 2. Twenty Parametric Variations (Generated On-the-Fly with Continuous Random Noise):
-   - Proves zero overfitting to static strings or fixed constants.
    - Evaluates physics-grounded threshold classifications across continuous distributions
      of current, gas chromatography, thermal gradient, and protection relay flags.
 
 Verifies 100% causal grounding, physical invariants, and fail-closed safety.
+Reports authentic evaluated counts and exits with code 1 if any scenario fails.
 """
 
 from __future__ import annotations
@@ -149,46 +149,54 @@ def generate_parametric_incident(case_type: str, seed: int) -> dict:
                 "scada_telemetry": [{
                     "row_id": f"SCADA-{seed}-D",
                     "voltage_v": 13200,
-                    "current_phase_a_amps": round(rng.uniform(80, 110), 1),
-                    "current_phase_b_amps": round(rng.uniform(80, 110), 1),
-                    "current_phase_c_amps": round(rng.uniform(80, 110), 1),
-                    "neutral_current_amps": round(rng.uniform(10, 20), 1),
-                    "relay_flags": ["INTERMITTENT_ALARM"],
+                    "current_phase_a_amps": round(rng.uniform(70, 95), 1),
+                    "current_phase_b_amps": round(rng.uniform(70, 95), 1),
+                    "current_phase_c_amps": round(rng.uniform(70, 95), 1),
+                    "neutral_current_amps": round(rng.uniform(10, 30), 1),
+                    "relay_flags": ["RESIDUAL_CURRENT_ALARM_INTERMITTENT"],
                 }],
-                "maintenance_history": [],  # Missing
+                "maintenance_history": [],
                 "tickets_database": [],
             },
         }
 
 
 def run_benchmark() -> bool:
+    """Executes the full evaluation suite and returns True if and only if all tests pass."""
     print("=" * 80)
     print("  HG GridMind — Comprehensive Generalization & Adversarial Benchmark")
     print("  Open Agent Hackathon 2026 | Challenge 02")
     print("=" * 80)
 
-    # 1. Four Anchor Scenarios from JSON files
-    anchor_fixtures = [
-        ("INC_2026_UTIL_8812", "REJECTED_AS_FALSE_CORRELATION", "Terminal Loose Joint / Phase B Unbalance"),
-        ("INC_2026_UTIL_9041", "CONFIRMED_INTERNAL_CATASTROPHIC_FAILURE", "Catastrophic Internal Winding Arc"),
-        ("INC_2026_UTIL_7720", "CONFIRMED_DOWNSTREAM_FEEDER_FAULT", "Downstream Symmetrical Line Fault"),
-        ("INC_2026_UTIL_5501", "ABSTENTION_INSUFFICIENT_EVIDENCE", "Strict Abstention (Missing Data)"),
+    start_time = time.time()
+    all_passed = True
+
+    # 1. Four Anchor Realistic Topologies
+    print("\n--- STAGE 1: ANCHOR REALISTIC TOPOLOGIES (4 SCENARIOS) ---")
+    anchors = [
+        ("INC_2026_UTIL_8812", "REJECTED_AS_FALSE_CORRELATION", "Internal Dielectric Breakdown / Transformer Winding Arc"),
+        ("INC_2026_UTIL_9041", "CONFIRMED_INTERNAL_CATASTROPHIC_FAILURE", "External Downstream Feeder Branch Fault"),
+        ("INC_2026_UTIL_7720", "CONFIRMED_DOWNSTREAM_FEEDER_FAULT", "Internal Dielectric Insulation Breakdown"),
+        ("INC_2026_UTIL_5501", "ABSTENTION_INSUFFICIENT_EVIDENCE", "Internal Dielectric Breakdown / Transformer Winding Arc"),
     ]
 
-    all_passed = True
-    start_time = time.time()
-
-    print("\n--- STAGE 1: ANCHOR REALISTIC TOPOLOGIES (4 SCENARIOS) ---")
-    for incident_id, expected_verdict, test_label in anchor_fixtures:
-        fixture_file = ROOT_DIR / "fixtures" / f"incident_{incident_id}.json"
-        connector = FederatedDataConnector(fixture_file)
+    anchor_passed = 0
+    for file_stub, expected_verdict, refuted_hyp in anchors:
+        fixture = ROOT_DIR / "fixtures" / f"incident_{file_stub}.json"
+        connector = FederatedDataConnector(fixture)
         commander = GridMindCommander(connector)
-
         diag = commander.investigate_incident()
-        status_pass = diag.initial_verdict == expected_verdict
-        print(f"[{'PASS' if status_pass else 'FAIL'}] {incident_id} -> {diag.initial_verdict} (Refuted H1: {'H1' in str(diag.falsified_hypotheses)})")
-        if not status_pass:
+
+        verdict_ok = diag.initial_verdict == expected_verdict
+        refuted_ok = any(f["hypothesis"] == refuted_hyp for f in diag.falsified_hypotheses) or expected_verdict == "ABSTENTION_INSUFFICIENT_EVIDENCE"
+        status_pass = verdict_ok and refuted_ok
+
+        if status_pass:
+            anchor_passed += 1
+            print(f"[PASS] {file_stub} -> {diag.initial_verdict} (Refuted H1: {refuted_ok})")
+        else:
             all_passed = False
+            print(f"[FAIL] {file_stub} -> Got: {diag.initial_verdict} (Expected: {expected_verdict})")
 
     # 2. Twenty Parametric Variations (On-the-Fly Continuous Random Generation)
     print("\n--- STAGE 2: CONTINUOUS PARAMETRIC VARIATION TEST (20 UNSEEN CASES) ---")
@@ -217,32 +225,42 @@ def run_benchmark() -> bool:
             expected = incident_data["expected_verdict"]
             is_ok = diag.initial_verdict == expected
 
-            if is_ok:
+            # Verify fail-closed gate on every parametric case
+            gate_blocked = False
+            try:
+                commander.dispatch_remediation_task(diag)
+            except HumanApprovalRequiredError:
+                gate_blocked = True  # Correct fail-closed behavior
+
+            case_pass = is_ok and gate_blocked
+            if case_pass:
                 parametric_passed += 1
             else:
                 all_passed = False
 
-            # Verify fail-closed gate on every parametric case
-            try:
-                commander.dispatch_remediation_task(diag)
-                all_passed = False
-            except HumanApprovalRequiredError:
-                pass  # Correct fail-closed behavior
-
-            print(f"  [Case {idx:02d}/20 - {chosen_type[:16]:16s}] Got: {diag.initial_verdict[:28]:28s} -> {'PASS' if is_ok else 'FAIL'}")
+            print(f"  [Case {idx:02d}/20 - {chosen_type[:16]:16s}] Got: {diag.initial_verdict[:28]:28s} -> {'PASS' if case_pass else 'FAIL'}")
 
     finally:
         # Cleanup temp directory
         for f in temp_dir.glob("*.json"):
-            f.unlink()
-        temp_dir.rmdir()
+            try:
+                f.unlink()
+            except OSError:
+                pass
+        try:
+            temp_dir.rmdir()
+        except OSError:
+            pass
 
     total_time = round(time.time() - start_time, 3)
+    total_evaluated = 4 + 20
+    total_passed = anchor_passed + parametric_passed
+    pass_pct = round((total_passed / total_evaluated) * 100, 1)
+
     print("\n" + "=" * 80)
-    print(f"  TOTAL RESULTS: 4/4 Anchor Scenarios PASS | 20/20 Parametric Cases PASS")
-    print(f"  TOTAL CASES EVALUATED: 24/24 PASS (100% SUCCESS) in {total_time}s")
-    print("  Zero Overfitting Proof: The agent dynamically calculates physical invariants,")
-    print("  Kirchhoff load balances, and gas thresholds across continuous random distributions.")
+    print(f"  TOTAL RESULTS: {anchor_passed}/4 Anchor Scenarios PASS | {parametric_passed}/20 Parametric Cases PASS")
+    print(f"  TOTAL CASES EVALUATED: {total_passed}/{total_evaluated} PASS ({pass_pct}%) in {total_time}s")
+    print(f"  STATUS: {'ALL PASS' if all_passed else 'BENCHMARK FAILED'}")
     print("=" * 80)
 
     return all_passed
