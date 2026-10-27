@@ -1,0 +1,4 @@
+[bootstrap] administrator 'admin@zetaris.com' can log in
+[bootstrap] registering the sample datasets NY_TAXI and TPCDS_DB
+[bootstrap] sample data registered
+[bootstrap] done

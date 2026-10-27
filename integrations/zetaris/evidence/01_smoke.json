@@ -1,0 +1,85 @@
+{
+ "statements": [
+  {
+   "sql": "SELECT 1 AS one",
+   "elapsed_ms": 165,
+   "row_count": 1,
+   "rows": [
+    [
+     "1"
+    ]
+   ],
+   "columns": [
+    "one"
+   ]
+  },
+  {
+   "sql": "SHOW SERVER VERSION",
+   "elapsed_ms": 92,
+   "row_count": 1,
+   "rows": [
+    [
+     "2.4.3.1",
+     "production",
+     "10/2/26, 4:30 AM",
+     "2.4.3.1",
+     "cb88df0b"
+    ]
+   ],
+   "columns": [
+    "version",
+    "build_target",
+    "build_time",
+    "build_tag",
+    "build_hash"
+   ]
+  },
+  {
+   "sql": "SHOW LIGHTNING DATABASES",
+   "elapsed_ms": 58,
+   "row_count": 2,
+   "rows": [
+    [
+     "NY_TAXI",
+     "NY Taxi sample data",
+     "6"
+    ],
+    [
+     "TPCDS_DB",
+     "TPC-DS benchmark sample data",
+     "308"
+    ]
+   ],
+   "columns": [
+    "name",
+    "description",
+    "id"
+   ]
+  },
+  {
+   "sql": "SHOW DATASOURCES",
+   "elapsed_ms": 44,
+   "row_count": 0,
+   "rows": [],
+   "columns": [
+    "name",
+    "description",
+    "id"
+   ]
+  },
+  {
+   "sql": "SELECT * FROM NY_TAXI.taxi_zones LIMIT 5",
+   "elapsed_ms": 8228,
+   "row_count": 5,
+   "rows": "(omitted: large geometry column)",
+   "columns": [
+    "OBJECTID",
+    "Shape_Leng",
+    "the_geom",
+    "Shape_Area",
+    "zone",
+    "LocationID"
+   ]
+  }
+ ]
+}
