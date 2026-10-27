@@ -1,0 +1,56 @@
+2026-10-27 ~09:20 ART, PC with Zetaris 2.4.3.1 live + Meterless H-MEM vendored, GRIDMIND_ZETARIS_LIVE=1:
+python -m unittest discover tests -v
+python : test_adversarial_scenario_downstream_line_fault 
+(test_gridmind.TestGridMindComprehensiveSuite.test_adversarial_scenario_downstream_line_fault)
+En C:\Users\Administrator\AppData\Local\Temp\ps-script-fc672cae-1725-442a-8cff-81bc723dbc57.ps1: 104 Carácter: 382
++ ... chain.json).Length; python -m unittest discover tests -v 2>&1 | Out-F ...
++                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_adversaria...eam_line_fault):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Tests that incident 7720 correctly identifies external line fault. ... ok
+test_adversarial_scenario_missing_evidence_abstention 
+(test_gridmind.TestGridMindComprehensiveSuite.test_adversarial_scenario_missing_evidence_abstention)
+Tests that incident 5501 strictly abstains to prevent hallucinations. ... ok
+test_adversarial_scenario_real_internal_failure 
+(test_gridmind.TestGridMindComprehensiveSuite.test_adversarial_scenario_real_internal_failure)
+Tests that incident 9041 correctly triggers internal arc diagnosis. ... ok
+test_cursor_environment_audit (test_gridmind.TestGridMindComprehensiveSuite.test_cursor_environment_audit) ... ok
+test_human_approval_gate_fail_closed_without_token 
+(test_gridmind.TestGridMindComprehensiveSuite.test_human_approval_gate_fail_closed_without_token) ... ok
+test_human_approval_gate_passes_with_authenticated_token 
+(test_gridmind.TestGridMindComprehensiveSuite.test_human_approval_gate_passes_with_authenticated_token) ... ok
+test_meterless_context_engines (test_gridmind.TestGridMindComprehensiveSuite.test_meterless_context_engines) ... ok
+test_nemotron_causal_reasoner_evaluation 
+(test_gridmind.TestGridMindComprehensiveSuite.test_nemotron_causal_reasoner_evaluation) ... ok
+test_zetaris_virtual_data_fabric_query_plan 
+(test_gridmind.TestGridMindComprehensiveSuite.test_zetaris_virtual_data_fabric_query_plan) ... ok
+test_bad_feedback_rejected (test_meterless_real.OfflineTests.test_bad_feedback_rejected) ... ok
+test_default_off_is_labelled_mimic (test_meterless_real.OfflineTests.test_default_off_is_labelled_mimic) ... ok
+test_engine_unavailable_never_raises (test_meterless_real.OfflineTests.test_engine_unavailable_never_raises) ... ok
+test_facts_one_per_source_row_with_provenance 
+(test_meterless_real.OfflineTests.test_facts_one_per_source_row_with_provenance) ... ok
+test_requested_without_real_zetaris_rows_falls_back 
+(test_meterless_real.OfflineTests.test_requested_without_real_zetaris_rows_falls_back) ... ok
+test_connector_end_to_end_with_real_hmem 
+(test_meterless_real.RealEngineTests.test_connector_end_to_end_with_real_hmem) ... ok
+test_real_hmem_ingest_recall_ledger_feedback 
+(test_meterless_real.RealEngineTests.test_real_hmem_ingest_recall_ledger_feedback) ... ok
+test_asset_id_injection_is_rejected 
+(test_zetaris_real.TestRealEngineBridgeOffline.test_asset_id_injection_is_rejected) ... ok
+test_default_connector_stays_on_mock 
+(test_zetaris_real.TestRealEngineBridgeOffline.test_default_connector_stays_on_mock) ... ok
+test_engine_error_is_unavailable (test_zetaris_real.TestRealEngineBridgeOffline.test_engine_error_is_unavailable) ... 
+ok
+test_not_configured_by_default (test_zetaris_real.TestRealEngineBridgeOffline.test_not_configured_by_default) ... ok
+test_real_path_parses_runner_output_and_keeps_password_out_of_argv 
+(test_zetaris_real.TestRealEngineBridgeOffline.test_real_path_parses_runner_output_and_keeps_password_out_of_argv) ... 
+ok
+test_requested_but_unavailable_falls_back_without_raising 
+(test_zetaris_real.TestRealEngineBridgeOffline.test_requested_but_unavailable_falls_back_without_raising) ... ok
+test_live_version_and_federated_join (test_zetaris_real.TestRealEngineLive.test_live_version_and_federated_join) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 13.584s
+
+OK
