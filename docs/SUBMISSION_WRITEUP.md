@@ -32,7 +32,7 @@ When a distribution transformer trips, operators tend to assume the worst (inter
 
 ## 4. How Cursor was used
 
-Cursor is the technical executor in the author's workflow: tasks are written as GitHub issues (#8 and #9 are the canonical specs for the Zetaris work), implemented by an AI coding agent on a branch, verified by running the test suite, and delivered as a Draft pull request (#10) for human review. In this build the agent wrote the offline deterministic test harness, the refactor towards zero-ETL federation, the real-engine bridges, and the evidence scripts; every change is traceable in the git history (`edef57c` … `52f3364`) and the PR. Nothing was merged to `main` or submitted without the author's approval.
+Cursor is the technical executor in the author's workflow: tasks are written as GitHub issues (#8 and #9 are the canonical specs for the Zetaris work), implemented by an AI coding agent on a branch, verified by running the test suite, and delivered as a Draft pull request (#10) for human review. For the real-engine work the agent wrote the two bridges, their tests and the evidence scripts (PR #10); every change is traceable in the git history (`edef57c` … `d974e6f`) and the PR. Nothing was merged to `main` or submitted without the author's approval.
 
 ## 5. NVIDIA
 
