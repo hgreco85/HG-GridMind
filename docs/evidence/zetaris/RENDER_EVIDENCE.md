@@ -5,11 +5,11 @@ already committed on this branch. Nothing was re-recorded, re-installed or re-ru
 
 | Property | Value |
 |---|---|
-| File | `HG-STACK_281026.mp4` (15.6 MB) |
-| SHA-256 | `f5bcde920900e7254ec2e68a660da1ec00ffca26ffecf3deeacd20771f443f8a` |
+| File | `HG-STACK_281026.mp4` (16.9 MB) |
+| SHA-256 | `5c933a5305d3e7b18c2d7d7fcb1cc17b70df82464e1a4c01d4b250d9dbd85cca` |
 | Duration | 85.680 s (2142 frames @ 25 fps) |
 | Video | H.264 High, `yuv420p`, 1920×1080, 25 fps, ~1.45 Mb/s |
-| Audio | AAC-LC, 48 kHz, stereo (silent track today — see *Narration*) |
+| Audio | AAC-LC, 48 kHz, stereo, ~175 kb/s; narration starts at 5.000 s; integrated loudness −16.4 LUFS, true peak −4.4 dBFS |
 | Container | MP4 with `+faststart` (plays in a browser tab) |
 | Cost | USD 0, local only |
 
@@ -73,24 +73,38 @@ The script needs any FFmpeg build with `libx264`, `aac`, `overlay`, `drawbox` an
 Playwright-cached binary is **not** usable (built `--disable-everything`, VP9/PNG only); a portable
 GPL build was used instead (`N-128121`), no install and no admin rights.
 
-## Narration (still missing)
+## Narration
 
-`HG GridMind - Zetaris.mp3` (52.5 s) is not on this machine: not in the repo, any branch history, the
-user profile, `F:`, or the authorised Drive remote (`drive.file` scope, backups folder only). The
-master above is **picture-locked** with a silent AAC track so it already plays in a browser.
+Source: `HG GridMind - Zetaris.mp3` (ElevenLabs, 52.51 s, 44.1 kHz mono, 128 kb/s), found inside
+`HG_GridMind_Zetaris_RENDER_KIT.zip` in the user's Downloads. The MP3 itself is **not committed**
+(audio is never versioned or published); keep it outside the repo and pass its path to the script.
 
-When the MP3 is available, one command finishes the deliverable — nothing is re-rendered:
+- Measured source loudness: −24.3 LUFS, true peak −3.6 dBFS. Normalised with two-pass EBU R128
+  (linear gain, target −16 LUFS, true peak −1.5 dBTP) → final −16.4 LUFS, peak −4.4 dBFS.
+- Placed at `adelay=5000` → speech starts at 5.000 s and ends at ~57.5 s, where the silent demo begins.
+- Verified on the final file: silence before 5.0 s (max −91 dB), speech level right after 5.0 s, audio
+  stream ends at the end of the narration, video runs to 85.68 s.
+
+Full command used:
 
 ```powershell
-ffmpeg -i HG-STACK_281026.mp4 -i "HG GridMind - Zetaris.mp3" `
-  -filter_complex "[1:a]adelay=5000:all=1,aresample=48000[a]" `
-  -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -ar 48000 -ac 2 `
-  -movflags +faststart -y HG-STACK_281026.mp4
+python docs/evidence/zetaris/render/render_final_video.py `
+  --ffmpeg <ffmpeg.exe> --date 281026 --crf 19 --preset slow `
+  --narration "<path>\HG GridMind - Zetaris.mp3"
 ```
 
-`adelay=5000` starts the narration at 5.000 s, exactly where the title card hands over to the real UI;
-it ends at 57.500 s, where the silent demo begins. Do **not** add `-shortest` (it would cut the film at
-57.5 s).
+Do **not** add `-shortest` to any manual mux: it would cut the film at 57.5 s.
+
+## Open checks for the user (by ear, not verifiable here)
+
+- The kit's own README flags that the supplied transcript spelled the product as "Zatarus"; confirm the
+  narration says "Zetaris".
+- The contest email asks for a 40–60 s explanation of *why Zetaris is amazing*. The narration is 52.5 s
+  and includes non-Zetaris framing at the start. The on-screen `WHY ZETARIS` window covers the whole
+  narration (5.00–57.48 s); if you need a strictly Zetaris-only cut, the narration's Zetaris lines must
+  be identified by ear and the window retimed in the script.
+- The kit README gives a different deadline and filename date (Tue 3 Nov 2026, `HG-STACK_031126.mp4`)
+  than issue #8 (Thu 29 Oct). Confirm the official date before naming or uploading.
 
 ## Organizer-facing notes
 

@@ -343,6 +343,22 @@ def probe(ffprobe: str, path: str) -> dict:
     return json.loads(p.stdout)
 
 
+def normalize_audio(ffmpeg: str, src: str, dst: str, i_lufs: float, tp: float) -> dict:
+    """Two-pass EBU R128 normalisation (linear gain + true-peak limit)."""
+    filt = f"loudnorm=I={i_lufs}:TP={tp}:LRA=11:print_format=json"
+    p = subprocess.run([ffmpeg, "-hide_banner", "-nostats", "-i", src, "-af", filt, "-f", "null", "NUL"],
+                       capture_output=True, text=True)
+    blob = p.stderr[p.stderr.rfind("{"):p.stderr.rfind("}") + 1]
+    m = json.loads(blob)
+    filt2 = (f"loudnorm=I={i_lufs}:TP={tp}:LRA=11:linear=true"
+             f":measured_I={m['input_i']}:measured_TP={m['input_tp']}"
+             f":measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}"
+             f":offset={m['target_offset']},aresample=48000")
+    run([ffmpeg, "-hide_banner", "-loglevel", "error", "-i", src, "-af", filt2,
+         "-ar", "48000", "-ac", "1", "-c:a", "pcm_s16le", "-y", dst], "normalise narration")
+    return m
+
+
 # ----------------------------------------------------------------------------- main
 def main() -> None:
     ap = argparse.ArgumentParser()
@@ -350,6 +366,9 @@ def main() -> None:
     ap.add_argument("--date", default="281026", help="upload date DDMMYY for the filename")
     ap.add_argument("--narration", default=None, help="52.5 s narration mp3 (optional)")
     ap.add_argument("--narration-offset", type=float, default=5.0)
+    ap.add_argument("--no-normalize", action="store_true", help="skip EBU R128 normalisation")
+    ap.add_argument("--loudness", type=float, default=-16.0, help="target integrated LUFS")
+    ap.add_argument("--true-peak", type=float, default=-1.5, help="target true peak dBTP")
     ap.add_argument("--crf", type=int, default=22)
     ap.add_argument("--preset", default="slow")
     ap.add_argument("--work", default=None)
@@ -487,12 +506,18 @@ def main() -> None:
 
     duration = total_frames / FPS
     final = os.path.join(outdir, f"HG-STACK_{args.date}.mp4")
+    norm_info = None
     if args.narration:
         if not os.path.exists(args.narration):
             raise SystemExit(f"narration not found: {args.narration}")
-        print("mux narration:", flush=True)
         delay = int(round(args.narration_offset * 1000))
-        run([ffmpeg, "-hide_banner", "-loglevel", "error", "-i", silent, "-i", args.narration,
+        src_audio = args.narration
+        norm_info = None
+        if not args.no_normalize:
+            src_audio = os.path.join(work, "narration_normalised.wav")
+            norm_info = normalize_audio(ffmpeg, args.narration, src_audio, args.loudness, args.true_peak)
+        print("mux narration:", flush=True)
+        run([ffmpeg, "-hide_banner", "-loglevel", "error", "-i", silent, "-i", src_audio,
              "-filter_complex", f"[1:a]adelay={delay}:all=1,aresample=48000[a]",
              "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
              "-ar", "48000", "-ac", "2", "-movflags", "+faststart", "-y", final], "final with narration")
@@ -532,6 +557,14 @@ def main() -> None:
                                                "r_frame_rate", "avg_frame_rate", "bit_rate")},
         "audio_stream": {k: a.get(k) for k in ("codec_name", "sample_rate", "channels", "bit_rate")},
         "audio_source": audio_note,
+        "audio_normalisation": None if not norm_info else {
+            "target_I": args.loudness,
+            "target_TP": args.true_peak,
+            "measured_I": float(norm_info["input_i"]),
+            "measured_TP": float(norm_info["input_tp"]),
+            "measured_LRA": float(norm_info["input_lra"]),
+        },
+        "narration_offset_s": args.narration_offset if args.narration else None,
         "narration_window_s": [5.0, 57.5],
         "why_zetaris_window_s": [5.0, 57.48],
         "timeline": tl,

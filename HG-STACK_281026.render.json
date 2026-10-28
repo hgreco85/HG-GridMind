@@ -1,7 +1,7 @@
 {
   "video": "HG-STACK_281026.mp4",
-  "sha256": "f5bcde920900e7254ec2e68a660da1ec00ffca26ffecf3deeacd20771f443f8a",
-  "bytes": 15647929,
+  "sha256": "5c933a5305d3e7b18c2d7d7fcb1cc17b70df82464e1a4c01d4b250d9dbd85cca",
+  "bytes": 16870738,
   "duration_s": 85.68,
   "video_stream": {
     "codec_name": "h264",
@@ -17,9 +17,17 @@
     "codec_name": "aac",
     "sample_rate": "48000",
     "channels": 2,
-    "bit_rate": "2275"
+    "bit_rate": "175204"
   },
-  "audio_source": "SILENT (narration pending)",
+  "audio_source": "HG_GridMind_Zetaris.mp3",
+  "audio_normalisation": {
+    "target_I": -16.0,
+    "target_TP": -1.5,
+    "measured_I": -24.47,
+    "measured_TP": -3.63,
+    "measured_LRA": 3.8
+  },
+  "narration_offset_s": 5.0,
   "narration_window_s": [
     5.0,
     57.5
