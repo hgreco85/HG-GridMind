@@ -1,0 +1,98 @@
+{
+  "video": "HG-STACK_281026.mp4",
+  "sha256": "f5bcde920900e7254ec2e68a660da1ec00ffca26ffecf3deeacd20771f443f8a",
+  "bytes": 15647929,
+  "duration_s": 85.68,
+  "video_stream": {
+    "codec_name": "h264",
+    "profile": "High",
+    "width": 1920,
+    "height": 1080,
+    "pix_fmt": "yuv420p",
+    "r_frame_rate": "25/1",
+    "avg_frame_rate": "25/1",
+    "bit_rate": "1452597"
+  },
+  "audio_stream": {
+    "codec_name": "aac",
+    "sample_rate": "48000",
+    "channels": 2,
+    "bit_rate": "2275"
+  },
+  "audio_source": "SILENT (narration pending)",
+  "narration_window_s": [
+    5.0,
+    57.5
+  ],
+  "why_zetaris_window_s": [
+    5.0,
+    57.48
+  ],
+  "timeline": [
+    {
+      "segment": "s1_title",
+      "start_s": 0.0,
+      "end_s": 5.0,
+      "frames": 125,
+      "source": "designed card"
+    },
+    {
+      "segment": "s2_engine",
+      "start_s": 5.0,
+      "end_s": 17.0,
+      "frames": 300,
+      "source": "zetaris_ui_live_20261028T145726Z.webm"
+    },
+    {
+      "segment": "s3_query",
+      "start_s": 17.0,
+      "end_s": 31.0,
+      "frames": 350,
+      "source": "zetaris_ui_live_20261028T145726Z.webm"
+    },
+    {
+      "segment": "s4_rows",
+      "start_s": 31.0,
+      "end_s": 45.48,
+      "frames": 362,
+      "source": "zetaris_ui_live_20261028T145726Z.webm"
+    },
+    {
+      "segment": "s5_trace",
+      "start_s": 45.48,
+      "end_s": 57.48,
+      "frames": 300,
+      "source": "gridmind_e2e_transcript_20261028T150347Z.webm"
+    },
+    {
+      "segment": "s6_gate",
+      "start_s": 57.48,
+      "end_s": 71.68,
+      "frames": 355,
+      "source": "gridmind_e2e_transcript_20261028T150347Z.webm"
+    },
+    {
+      "segment": "s7_proof",
+      "start_s": 71.68,
+      "end_s": 78.68,
+      "frames": 175,
+      "source": "designed card"
+    },
+    {
+      "segment": "s8_closing",
+      "start_s": 78.68,
+      "end_s": 85.68,
+      "frames": 175,
+      "source": "designed card"
+    }
+  ],
+  "encoder": "ffmpeg version N-128121-g86444dd368-20261027 Copyright (c) 2000-2026 the FFmpeg developers",
+  "crf": 19,
+  "preset": "slow",
+  "sources": {
+    "ui_clip": "zetaris_ui_live_20261028T145726Z.webm",
+    "trace_clip": "gridmind_e2e_transcript_20261028T150347Z.webm",
+    "facts": "integrations/zetaris/evidence/07_e2e_trace_INC8812.json"
+  },
+  "render_script": "docs/evidence/zetaris/render/render_final_video.py"
+}
