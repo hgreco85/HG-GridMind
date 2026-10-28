@@ -1,0 +1,402 @@
+{
+ "ts_local": "2026-10-27T09:18:34.683632-03:00",
+ "zetaris": {
+  "used": true,
+  "execution_mode": "REAL_ZETARIS_ENGINE_LOCAL_DOCKER",
+  "row_count": 10,
+  "elapsed_ms": 566,
+  "reason": null
+ },
+ "meterless": {
+  "used": true,
+  "execution_mode": "REAL_METERLESS_HMEM_ENGINE",
+  "engine": "Meterless H-MEM reference (vendor/hmem)",
+  "memories_total": 8,
+  "added": 8,
+  "reason": null
+ },
+ "answers": [
+  {
+   "question": "why is the neutral current overloaded on TR-102",
+   "strategy": "comprehensive",
+   "retrievalReason": "hybrid ranking for \"why is the neutral current overloaded on TR-102\" (domain: general)",
+   "scores": {
+    "mem-1": 0.3577,
+    "mem-3": 0.3355,
+    "mem-5": 0.3352,
+    "mem-4": 0.3309,
+    "mem-6": 0.3267
+   },
+   "memories": [
+    {
+     "id": "mem-1",
+     "relevance": 0.3577,
+     "content": "SCADA-ROW-44012 asset TR-102 at 2026-10-23 01:50:00.0: phase-B current 100.4 A, neutral current 37.5 A (neutral overload)",
+     "source": "zetaris:gridmind_scada_pg.scada_telemetry/SCADA-ROW-44012",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:scada",
+      "signal:neutral_current"
+     ]
+    },
+    {
+     "id": "mem-3",
+     "relevance": 0.3355,
+     "content": "TKT-9001 ticket RESIDUAL_CURRENT_TRIP reported at 2026-10-23 01:45:00 on the feeder of asset TR-102",
+     "source": "zetaris:gridmind_files.tickets_database/TKT-9001",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:ticket"
+     ]
+    },
+    {
+     "id": "mem-5",
+     "relevance": 0.3352,
+     "content": "SCADA-ROW-44011 asset TR-102 at 2026-10-23 01:40:00.0: phase-B current 99.5 A, neutral current 34.4 A (neutral overload)",
+     "source": "zetaris:gridmind_scada_pg.scada_telemetry/SCADA-ROW-44011",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:scada",
+      "signal:neutral_current"
+     ]
+    },
+    {
+     "id": "mem-4",
+     "relevance": 0.3309,
+     "content": "TKT-9002 ticket NEUTRAL_OVERLOAD_CALL reported at 2026-10-23 01:58:00 on the feeder of asset TR-102",
+     "source": "zetaris:gridmind_files.tickets_database/TKT-9002",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:ticket"
+     ]
+    },
+    {
+     "id": "mem-6",
+     "relevance": 0.3267,
+     "content": "SCADA-ROW-44010 asset TR-102 at 2026-10-23 01:30:00.0: phase-B current 98.6 A, neutral current 31.3 A (neutral overload)",
+     "source": "zetaris:gridmind_scada_pg.scada_telemetry/SCADA-ROW-44010",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:scada",
+      "signal:neutral_current"
+     ]
+    }
+   ],
+   "context": "[MEMORY CONTEXT]\n## general\n- [WK] SCADA-ROW-44012 asset TR-102 at 2026-10-23 01:50:00.0: phase-B current 100.4 A, neutral current 37.5 A (neutral overload) (entities: scada, row) <mem-1>\n- [WK] TKT-9001 ticket RESIDUAL_CURRENT_TRIP reported at 2026-10-23 01:45:00 on the feeder of asset TR-102 (entities: tkt) <mem-3>\n- [WK] SCADA-ROW-44011 asset TR-102 at 2026-10-23 01:40:00.0: phase-B current 99.5 A, neutral current 34.4 A (neutral overload) (entities: scada, row) <mem-5>\n- [WK] TKT-9002 ticket NEUTRAL_OVERLOAD_CALL reported at 2026-10-23 01:58:00 on the feeder of asset TR-102 (entities: tkt) <mem-4>\n- [WK] SCADA-ROW-44010 asset TR-102 at 2026-10-23 01:30:00.0: phase-B current 98.6 A, neutral current 31.3 A (neutral overload) (entities: scada, row) <mem-6>\n[/MEMORY CONTEXT]"
+  },
+  {
+   "question": "what does the dissolved gas analysis say about TR-102",
+   "strategy": "comprehensive",
+   "retrievalReason": "hybrid ranking for \"what does the dissolved gas analysis say about TR-102\" (domain: general)",
+   "scores": {
+    "mem-3": 0.2786,
+    "mem-1": 0.2685,
+    "mem-4": 0.2551,
+    "mem-5": 0.2221,
+    "mem-2": 0.2202
+   },
+   "memories": [
+    {
+     "id": "mem-3",
+     "relevance": 0.2786,
+     "content": "TKT-9001 ticket RESIDUAL_CURRENT_TRIP reported at 2026-10-23 01:45:00 on the feeder of asset TR-102",
+     "source": "zetaris:gridmind_files.tickets_database/TKT-9001",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:ticket"
+     ]
+    },
+    {
+     "id": "mem-1",
+     "relevance": 0.2685,
+     "content": "SCADA-ROW-44012 asset TR-102 at 2026-10-23 01:50:00.0: phase-B current 100.4 A, neutral current 37.5 A (neutral overload)",
+     "source": "zetaris:gridmind_scada_pg.scada_telemetry/SCADA-ROW-44012",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:scada",
+      "signal:neutral_current"
+     ]
+    },
+    {
+     "id": "mem-4",
+     "relevance": 0.2551,
+     "content": "TKT-9002 ticket NEUTRAL_OVERLOAD_CALL reported at 2026-10-23 01:58:00 on the feeder of asset TR-102",
+     "source": "zetaris:gridmind_files.tickets_database/TKT-9002",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:ticket"
+     ]
+    },
+    {
+     "id": "mem-5",
+     "relevance": 0.2221,
+     "content": "SCADA-ROW-44011 asset TR-102 at 2026-10-23 01:40:00.0: phase-B current 99.5 A, neutral current 34.4 A (neutral overload)",
+     "source": "zetaris:gridmind_scada_pg.scada_telemetry/SCADA-ROW-44011",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:scada",
+      "signal:neutral_current"
+     ]
+    },
+    {
+     "id": "mem-2",
+     "relevance": 0.2202,
+     "content": "MNT-7002 asset TR-102 DGA maintenance verdict WATCH_HOT_SPOT, acetylene 4.8 ppm (thermal hot spot, not arcing)",
+     "source": "zetaris:gridmind_files.maintenance_history/MNT-7002",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:maintenance",
+      "signal:dga"
+     ]
+    }
+   ],
+   "context": "[MEMORY CONTEXT]\n## general\n- [WK] TKT-9001 ticket RESIDUAL_CURRENT_TRIP reported at 2026-10-23 01:45:00 on the feeder of asset TR-102 (entities: tkt) <mem-3>\n- [WK] SCADA-ROW-44012 asset TR-102 at 2026-10-23 01:50:00.0: phase-B current 100.4 A, neutral current 37.5 A (neutral overload) (entities: scada, row) <mem-1>\n- [WK] TKT-9002 ticket NEUTRAL_OVERLOAD_CALL reported at 2026-10-23 01:58:00 on the feeder of asset TR-102 (entities: tkt) <mem-4>\n- [WK] SCADA-ROW-44011 asset TR-102 at 2026-10-23 01:40:00.0: phase-B current 99.5 A, neutral current 34.4 A (neutral overload) (entities: scada, row) <mem-5>\n- [WK] MNT-7002 asset TR-102 DGA maintenance verdict WATCH_HOT_SPOT, acetylene 4.8 ppm (thermal hot spot, not arcing) (entities: mnt, dga) <mem-2>\n[/MEMORY CONTEXT]"
+  },
+  {
+   "question": "which customer tickets relate to TR-102",
+   "strategy": "comprehensive",
+   "retrievalReason": "hybrid ranking for \"which customer tickets relate to TR-102\" (domain: general)",
+   "scores": {
+    "mem-2": 0.2815,
+    "mem-7": 0.267,
+    "mem-3": 0.2596,
+    "mem-5": 0.2573,
+    "mem-4": 0.2494
+   },
+   "memories": [
+    {
+     "id": "mem-2",
+     "relevance": 0.2815,
+     "content": "MNT-7002 asset TR-102 DGA maintenance verdict WATCH_HOT_SPOT, acetylene 4.8 ppm (thermal hot spot, not arcing)",
+     "source": "zetaris:gridmind_files.maintenance_history/MNT-7002",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:maintenance",
+      "signal:dga"
+     ]
+    },
+    {
+     "id": "mem-7",
+     "relevance": 0.267,
+     "content": "SCADA-ROW-44009 asset TR-102 at 2026-10-23 01:20:00.0: phase-B current 97.7 A, neutral current 28.2 A (neutral overload)",
+     "source": "zetaris:gridmind_scada_pg.scada_telemetry/SCADA-ROW-44009",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:scada",
+      "signal:neutral_current"
+     ]
+    },
+    {
+     "id": "mem-3",
+     "relevance": 0.2596,
+     "content": "TKT-9001 ticket RESIDUAL_CURRENT_TRIP reported at 2026-10-23 01:45:00 on the feeder of asset TR-102",
+     "source": "zetaris:gridmind_files.tickets_database/TKT-9001",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:ticket"
+     ]
+    },
+    {
+     "id": "mem-5",
+     "relevance": 0.2573,
+     "content": "SCADA-ROW-44011 asset TR-102 at 2026-10-23 01:40:00.0: phase-B current 99.5 A, neutral current 34.4 A (neutral overload)",
+     "source": "zetaris:gridmind_scada_pg.scada_telemetry/SCADA-ROW-44011",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:scada",
+      "signal:neutral_current"
+     ]
+    },
+    {
+     "id": "mem-4",
+     "relevance": 0.2494,
+     "content": "TKT-9002 ticket NEUTRAL_OVERLOAD_CALL reported at 2026-10-23 01:58:00 on the feeder of asset TR-102",
+     "source": "zetaris:gridmind_files.tickets_database/TKT-9002",
+     "layer": "working",
+     "confidence": 0.9,
+     "tags": [
+      "asset:TR-102",
+      "kind:ticket"
+     ]
+    }
+   ],
+   "context": "[MEMORY CONTEXT]\n## general\n- [WK] MNT-7002 asset TR-102 DGA maintenance verdict WATCH_HOT_SPOT, acetylene 4.8 ppm (thermal hot spot, not arcing) (entities: mnt, dga) <mem-2>\n- [WK] SCADA-ROW-44009 asset TR-102 at 2026-10-23 01:20:00.0: phase-B current 97.7 A, neutral current 28.2 A (neutral overload) (entities: scada, row) <mem-7>\n- [WK] TKT-9001 ticket RESIDUAL_CURRENT_TRIP reported at 2026-10-23 01:45:00 on the feeder of asset TR-102 (entities: tkt) <mem-3>\n- [WK] SCADA-ROW-44011 asset TR-102 at 2026-10-23 01:40:00.0: phase-B current 99.5 A, neutral current 34.4 A (neutral overload) (entities: scada, row) <mem-5>\n- [WK] TKT-9002 ticket NEUTRAL_OVERLOAD_CALL reported at 2026-10-23 01:58:00 on the feeder of asset TR-102 (entities: tkt) <mem-4>\n[/MEMORY CONTEXT]"
+  }
+ ],
+ "ledger": {
+  "mem-1": [
+   {
+    "action": "create",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.654Z",
+    "confidence": 0.9
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.668Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.670Z",
+    "confidence": null
+   }
+  ],
+  "mem-3": [
+   {
+    "action": "create",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.664Z",
+    "confidence": 0.9
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.669Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.670Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.671Z",
+    "confidence": null
+   }
+  ],
+  "mem-5": [
+   {
+    "action": "create",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.666Z",
+    "confidence": 0.9
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.669Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.670Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.671Z",
+    "confidence": null
+   }
+  ],
+  "mem-4": [
+   {
+    "action": "create",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.665Z",
+    "confidence": 0.9
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.669Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.670Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.671Z",
+    "confidence": null
+   }
+  ],
+  "mem-6": [
+   {
+    "action": "create",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.666Z",
+    "confidence": 0.9
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.669Z",
+    "confidence": null
+   }
+  ],
+  "mem-2": [
+   {
+    "action": "create",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.656Z",
+    "confidence": 0.9
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.670Z",
+    "confidence": null
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.671Z",
+    "confidence": null
+   }
+  ],
+  "mem-7": [
+   {
+    "action": "create",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.667Z",
+    "confidence": 0.9
+   },
+   {
+    "action": "read",
+    "actor": "gridmind-agent",
+    "at": "2026-10-27T12:18:34.671Z",
+    "confidence": null
+   }
+  ]
+ }
+}

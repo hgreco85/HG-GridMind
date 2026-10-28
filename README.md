@@ -1,7 +1,7 @@
 # HG GridMind — Autonomous AI Incident Commander
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests: 100% Offline](https://img.shields.io/badge/Unit%20Tests-9%2F9%20PASS-brightgreen.svg)]()
+[![Tests: 100% Offline](https://img.shields.io/badge/Unit%20Tests-23%2F23%20PASS-brightgreen.svg)]()
 [![Generalization Benchmark](https://img.shields.io/badge/Adversarial%20Benchmark-24%2F24%20PASS-success.svg)]()
 [![Challenge](https://img.shields.io/badge/Challenge%2002-The%20Agent%20That%20Can%20Explain%20Why-orange.svg)]()
 [![Zetaris](https://img.shields.io/badge/Zetaris-Zero--ETL%20Virtual%20SQL-blue.svg)]()
@@ -81,10 +81,60 @@ Conventional LLM chatbots fail catastrophically in this domain: they exhibit con
 ```
 
 ### Technical Disclosure & Sponsor Honesty
-- **Zetaris:** Implemented as a Virtual Data Fabric Adapter & Lightning SQL dialect engine over in-place silos. Organizer cloud registry remains in `[TBC]`; no remote cloud credentials were provided.
-- **Meterless:** Native open-source context protocol implementation in local Python (`H-MEM`, `Markovian`, `World Model`).
-- **NVIDIA Nemotron:** Dual-mode causal engine executing physics-grounded threshold rules by default (ensuring $0.00 spend and zero stochasticity), with a live connector ready for OpenAI-compatible / NIM inference.
-- **Cursor:** Development environment toolchain (v3.19.7).
+
+Default mode (what judges run with zero setup) is the **offline deterministic pipeline**. Two sponsor engines can additionally be switched on for **real** execution (opt-in, USD 0, see section 2b). Every output labels which mode ran.
+
+| Sponsor | Default (offline, deterministic) | Opt-in REAL engine (added 2026-10-27) | Still not real |
+|---|---|---|---|
+| **Zetaris** | `src/sponsors/zetaris_adapter.py`: one entry point, two labelled paths. **SIMULATION** (default): replays the fixture rows, plan says `SIMULATED (no engine contacted)`, payload carries `is_simulation: true`. **REAL** (opt-in): the same adapter executes the contract's SQL through `src/sponsors/zetaris_real.py` on a real Zetaris Lightning 2.4.3.1 (docker compose on the author's PC), 3-source join (PostgreSQL datasource + 2 CSV filestore tables) over a synthetic dataset | Not a hosted/cloud Zetaris; the organiser's cloud registry was not used; if the engine is off the adapter falls back to the labelled simulation |
+| **Meterless** | `src/sponsors/meterless_adapter.py`: a local Python *re-implementation* of the H-MEM / Markovian / World-Model ideas (not Meterless code) | `src/sponsors/meterless_real.py` + `integrations/meterless/`: runs the real **Meterless H-MEM reference engine** (Apache-2.0, vendored at setup) fed with the real Zetaris rows; ranked recall, retrieval trace, TrustLedger | World Model, Markovian and Scout Intent are still the local mimic |
+| **NVIDIA Nemotron** | `src/sponsors/nemotron_adapter.py`: deterministic physics rules engine | none: an OpenAI-compatible / NIM connector exists in code but **no live Nemotron inference has been run** for this submission | Do not read the repo as having live Nemotron calls |
+| **Cursor** | development environment (see `docs/SUBMISSION_WRITEUP.md`) | n/a | `src/sponsors/cursor_audit.py` is a static self-description, not telemetry |
+
+## 2b. Real engines: setup, usage, dependencies (opt-in)
+
+Nothing here is required to run the default demo. Details: [`integrations/zetaris/README.md`](integrations/zetaris/README.md), [`integrations/meterless/README.md`](integrations/meterless/README.md), [`docs/ZETARIS_REAL_VS_MOCK.md`](docs/ZETARIS_REAL_VS_MOCK.md).
+
+**Dependencies.** Core app: Python 3.9+ standard library only (no pip installs). Real Zetaris: Docker (Zetaris platform 2.4.3.1 via its own compose bundle plus `integrations/zetaris/docker-compose.override.yml`), Java 17+ and the official Zetaris JDBC driver jar. Real Meterless: Node 18+, npm and git (vendors `Meterless/Meterless@1742dec` `engines/hmem/reference`, Apache-2.0; dev dependency `tsx`).
+
+```bash
+# 1) Offline default (no setup)
+python main.py test            # 23 tests
+python evaluator.py            # 24-case benchmark
+python main.py run --signoff --operator "Your Name"
+
+# 2) Real Meterless H-MEM (free, no API key)
+bash integrations/meterless/setup.sh
+
+# 3) Real Zetaris (needs the Zetaris stack running; secrets only via env vars, never committed)
+export ZETARIS_JDBC_JAR=/path/to/ndp-jdbc-driver-2.4.3.1-*-driver.jar
+export ZETARIS_PASSWORD=...    # never commit / never pass on argv
+
+# 4) Run the full real chain: Zetaris federated join -> Meterless H-MEM recall + ledger
+export GRIDMIND_ZETARIS_REAL=1 GRIDMIND_METERLESS_REAL=1
+python integrations/meterless/demo_live_chain.py out.json
+GRIDMIND_ZETARIS_LIVE=1 python -m unittest discover tests   # includes live-engine tests
+
+# 5) Timestamped evidence + E2E trace + UI screen recording (all USD 0, local only)
+python integrations/zetaris/evidence/run_live_evidence.py --jar "$ZETARIS_JDBC_JAR" --show-summary
+python integrations/zetaris/evidence/run_e2e_demo.py --asset TR-102 --signoff
+python integrations/zetaris/evidence/capture_ui_video.py      # needs: python -m playwright install ffmpeg
+```
+
+If an engine is unavailable the connector never raises: `result["zetaris_real"]` / `result["meterless_real"]` report `{"used": false, "fallback": "SIMULATION"/"MIMIC", "is_simulation": true, "reason": ...}`.
+
+**Real-engine evidence (committed):** `integrations/zetaris/evidence/` (timestamped JDBC runs `05`/`06`/`07`, older `01`–`04`, docker ps, versions), `docs/evidence/zetaris/` (UI screenshots and 1080p recordings of the Zetaris UI running the federated query), `integrations/meterless/evidence/` (real Zetaris rows into real H-MEM, 23/23 tests with both engines live, upstream engine tests). Video material mapped to authentic shots: [`docs/ZETARIS_VIDEO_AUTHENTIC_SCENES.md`](docs/ZETARIS_VIDEO_AUTHENTIC_SCENES.md).
+
+**Honest limits.** The real Zetaris engine holds a small *synthetic* dataset that covers only asset TR-102 (fixture `INC_2026_UTIL_5501`); the other fixtures keep using the offline simulation. The incident reasoning (hypotheses, falsification, approval gate) is the pre-existing deterministic code; the real engines supply federated evidence and durable memory with provenance on top of it. The default path is still the simulation, and it says so in every payload.
+
+## 2c. Declaration: pre-existing code vs work done during the build window
+
+The hackathon build window opened on 2026-10-22. The first working version of GridMind was committed on **2026-10-23** (commits `edef57c`, `c7460c8`, `c6a66e9`, `3a39432`). The Zetaris and Meterless real-engine work below is a separate set of commits on 2026-10-27.
+
+- **Pre-existing at the start of the real-engine work (2026-10-23 commits):** `src/agent.py`, `src/gate.py`, `src/cli.py`, `main.py`, `evaluator.py`, the offline sponsor adapters (`zetaris_adapter.py`, `meterless_adapter.py`, `nemotron_adapter.py`, `cursor_audit.py`), `src/data_connector.py` (the mock federation), `fixtures/`, `web/` + `index.html`, `docs/` (slides, guide, video), `metadata.json`, and the original 9 tests plus the 24-case benchmark.
+- **New work (2026-10-27, PR #10):** `src/sponsors/zetaris_real.py`, `src/sponsors/meterless_real.py`, the opt-in wiring in `src/data_connector.py`, `integrations/zetaris/` (synthetic dataset, SQL, docker override, JDBC runner, evidence), `integrations/meterless/` (H-MEM bridge, setup, demo, evidence), `tests/test_zetaris_real.py`, `tests/test_meterless_real.py`, `docs/ZETARIS_REAL_VS_MOCK.md`, `docs/evidence/zetaris/`, `docs/SUBMISSION_WRITEUP.md`, this README section.
+- **New work (2026-10-28, same PR #10):** `zetaris_adapter.py` reworked into the real-first facade with the explicitly-labelled simulation fallback (plan says `SIMULATED (no engine contacted)`; payloads carry `is_simulation`/`simulation_disclosure`), `src/data_connector.py` delegating to it, timestamped evidence (`05_live_verified.json`, `06_e2e_trace_TR102.json`, `07_e2e_trace_INC8812.json`), the reproducible scripts `run_live_evidence.py` / `run_e2e_demo.py` / `capture_ui_video.py` / `render_transcript_clip.py`, new 1080p UI recording and E2E clip, `docs/ZETARIS_VIDEO_AUTHENTIC_SCENES.md`, and the test updates that assert the labelled-simulation contract.
+- **Third-party code:** the Meterless H-MEM reference engine (Apache-2.0, Meterless) is fetched at setup into a gitignored `vendor/` directory and is not part of this repository's history. The Zetaris platform and JDBC driver are Zetaris software obtained through the hackathon and are not redistributed here.
 
 ---
 
@@ -111,7 +161,7 @@ python evaluator.py
 
 Judges can verify the entire project in less than 60 seconds with zero accounts, zero API keys, and zero spend ($0.00):
 
-### A. Run Unit Test Suite (9 tests in ~0.25s):
+### A. Run Unit Test Suite (23 tests, ~1s; the live-engine tests auto-skip when the engines are not set up):
 ```bash
 python main.py test
 ```
@@ -141,5 +191,5 @@ Visit **[https://hgreco85.github.io/HG-GridMind/](https://hgreco85.github.io/HG-
 - **Participant:** Hernán Francisco Greco (`@hgreco85`).
 - **Isolation:** Standalone public repository decoupled from internal trading systems.
 - **Data Disclosure:** 100% synthetic utility grid incident records (`fixtures/`); no proprietary EDENOR or customer data.
-- **Cost Invariant:** $0.00 incremental spend throughout.
+- **Cost Invariant:** $0.00 incremental spend throughout (Zetaris and Meterless engines are free; no API keys used).
 - **License:** MIT License. See [LICENSE](LICENSE) for details.

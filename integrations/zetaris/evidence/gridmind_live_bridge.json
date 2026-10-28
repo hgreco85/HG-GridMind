@@ -1,0 +1,21 @@
+{
+ "ts_local": "2026-10-27T09:00:10.718843-03:00",
+ "note": "FederatedDataConnector(fixtures/incident_INC_2026_UTIL_5501.json, use_real_engine=True) against the real Zetaris 2.4.3.1 engine on the author's PC",
+ "used": true,
+ "mode": "REAL_ZETARIS_ENGINE_LOCAL_DOCKER",
+ "row_count": 10,
+ "elapsed_ms": 345,
+ "mock_plan_mode": "LOCAL_VIRTUAL_FEDERATION",
+ "first_row": {
+  "scada_row_id": "SCADA-ROW-44012",
+  "ts": "2026-10-23 01:50:00.0",
+  "current_phase_b_amps": "100.400000000000000000",
+  "neutral_current_amps": "37.500000000000000000",
+  "maint_row_id": "MNT-7002",
+  "dga_verdict": "WATCH_HOT_SPOT",
+  "acetylene_ppm": "4.8",
+  "ticket_row_id": "TKT-9001",
+  "ticket_type": "RESIDUAL_CURRENT_TRIP",
+  "reported_at": "2026-10-23 01:45:00"
+ }
+}

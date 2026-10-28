@@ -1,0 +1,14 @@
+# Local overrides for the Hernan/HG-GridMind demo (no public ports)
+services:
+  ui:
+    ports: !override
+      - "127.0.0.1:3000:3000"
+  gridmind-demo-pg:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gridmind
+      POSTGRES_PASSWORD: gridmind_demo_synthetic
+      POSTGRES_DB: scada
+    volumes:
+      - ./demo-data/01_scada_pg.sql:/docker-entrypoint-initdb.d/01_scada_pg.sql:ro

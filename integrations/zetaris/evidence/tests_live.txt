@@ -1,0 +1,5 @@
+2026-10-27 ~09:00 ART, PC with Zetaris 2.4.3.1 stack up, GRIDMIND_ZETARIS_LIVE=1:
+python -m unittest discover tests
+Ran 16 tests in 5.121s
+OK            (0 skipped: the live engine test ran and passed)
+Without an engine: Ran 16 tests, OK (skipped=1 = the live test only)

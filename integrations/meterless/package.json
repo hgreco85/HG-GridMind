@@ -1,0 +1,14 @@
+{
+  "name": "gridmind-meterless-hmem",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HG GridMind bridge to the real Meterless H-MEM engine (Apache-2.0, vendored at setup). Zero API keys.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "setup": "bash setup.sh"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}

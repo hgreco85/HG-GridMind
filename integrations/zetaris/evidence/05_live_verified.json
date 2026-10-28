@@ -1,0 +1,386 @@
+{
+  "evidence_schema": "hg-gridmind/zetaris-live-evidence/1",
+  "started_utc": "2026-10-28T14:54:05+00:00",
+  "started_local": "2026-10-28T11:54:05-03:00",
+  "host": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15"
+  },
+  "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS",
+  "env_file_used": "C:\\Users\\Administrator\\hg-sandbox\\zetaris\\zetaris-platform\\.env",
+  "jdbc_url": "jdbc:zetaris:lightning@localhost:10000",
+  "execution_mode": "REAL_ZETARIS_ENGINE_LOCAL_DOCKER",
+  "driver_jar": {
+    "path": "C:\\Users\\Administrator\\hg-sandbox\\zetaris\\zetaris-platform\\jdbc\\ndp-jdbc-driver-2.4.3.1-7eff043-driver.jar",
+    "sha256": "a344921760cb7e3747535ae77a25aef095150f4298632089096bca680ce13f6c"
+  },
+  "containers": [
+    {
+      "name": "zetaris-bootstrap-1",
+      "image": "zetarishackathon.azurecr.io/zetaris-ndp-driver:2.4.3-v2.4.3.1-hackathon.cb88df0b255aba5a9a9eda96483fc877cc82df80",
+      "status": "Exited (0) 15 hours ago",
+      "inspect": ""
+    },
+    {
+      "name": "zetaris-ui-1",
+      "image": "zetarishackathon.azurecr.io/zetaris-new-ui:2.4.3-v2.4.3.1-hackathon.88e49b0db015979a2d071d2d68a6865d38a39f15",
+      "status": "Up 52 seconds (healthy)",
+      "inspect": "cd3d74edab7458c8a6d1f186b181dc367f7e9b865165fb5fa3e8afeb703caed3|sha256:c6f30ab3e83a5a826be603240c3800b9192ff9247271c0dafa576e4ea46d7788|healthy"
+    },
+    {
+      "name": "zetaris-api-1",
+      "image": "zetarishackathon.azurecr.io/zetaris-ndp-api:2.4.3-v2.4.3.1-hackathon.a2848d8a41fa21673a0d719deb41b675412710fe",
+      "status": "Up 58 seconds (healthy)",
+      "inspect": "972afbfa1ad41512717dcdb14a03a30649b86a18dee36ad978ad16bb36dd9b4d|sha256:14c39e821684868bb5638d4d0fd4d0f57df1650bbc3e4f9cf5d078a390a28704|healthy"
+    },
+    {
+      "name": "zetaris-driver-1",
+      "image": "zetarishackathon.azurecr.io/zetaris-ndp-driver:2.4.3-v2.4.3.1-hackathon.cb88df0b255aba5a9a9eda96483fc877cc82df80",
+      "status": "Up 9 minutes (healthy)",
+      "inspect": "4aee80c60df4fd92f4b480f6ff75d094001475c56f3c6f9bc19bf6e6641bda18|sha256:0d112111909acbc6fb57250c74ec0fab7f05227599b52438427898cc3d0908ee|healthy"
+    },
+    {
+      "name": "zetaris-postgres-1",
+      "image": "postgres:16-alpine",
+      "status": "Up 9 minutes (healthy)",
+      "inspect": "d484510dd99ede8cd462e6089a388b0df8ba9e0d2e283bf9c2e1a480ebe6227c|sha256:6a2e324ebe59af6031c4c1cd96c1d5072c2ebc36563d2196365e43b8297c062d|healthy"
+    },
+    {
+      "name": "zetaris-gridmind-demo-pg-1",
+      "image": "postgres:16-alpine",
+      "status": "Up 9 minutes",
+      "inspect": ""
+    },
+    {
+      "name": "zetaris-init-1",
+      "image": "zetarishackathon.azurecr.io/zetaris-ndp-driver:2.4.3-v2.4.3.1-hackathon.cb88df0b255aba5a9a9eda96483fc877cc82df80",
+      "status": "Exited (0) 9 minutes ago",
+      "inspect": ""
+    }
+  ],
+  "statements": [
+    {
+      "name": "inventory",
+      "sql": "SHOW SERVER VERSION",
+      "columns": [
+        "version",
+        "build_target",
+        "build_time",
+        "build_tag",
+        "build_hash"
+      ],
+      "row_count": 1,
+      "rows": [
+        [
+          "2.4.3.1",
+          "production",
+          "10/2/26, 4:30 AM",
+          "2.4.3.1",
+          "cb88df0b"
+        ]
+      ],
+      "elapsed_ms": 101
+    },
+    {
+      "name": "inventory",
+      "sql": "SHOW DATASOURCES",
+      "columns": [
+        "name",
+        "description",
+        "id"
+      ],
+      "row_count": 1,
+      "rows": [
+        [
+          "gridmind_scada_pg",
+          "GridMind-synthetic-SCADA-PostgreSQL",
+          "806"
+        ]
+      ],
+      "elapsed_ms": 150
+    },
+    {
+      "name": "inventory",
+      "sql": "SHOW LIGHTNING DATABASES",
+      "columns": [
+        "name",
+        "description",
+        "id"
+      ],
+      "row_count": 3,
+      "rows": [
+        [
+          "gridmind_files",
+          "GridMind-synthetic-maintenance-and-tickets-CSV",
+          "824"
+        ],
+        [
+          "NY_TAXI",
+          "NY Taxi sample data",
+          "6"
+        ],
+        [
+          "TPCDS_DB",
+          "TPC-DS benchmark sample data",
+          "308"
+        ]
+      ],
+      "elapsed_ms": 73
+    },
+    {
+      "name": "inventory",
+      "sql": "SHOW DATASOURCE TABLES gridmind_scada_pg",
+      "columns": [
+        "name",
+        "relation",
+        "source_table",
+        "partition clause",
+        "description",
+        "materialized table",
+        "datasource_id",
+        "relation_id"
+      ],
+      "row_count": 1,
+      "rows": [
+        [
+          "scada_telemetry",
+          "Table",
+          "scada_telemetry",
+          "",
+          null,
+          null,
+          "806",
+          "813"
+        ]
+      ],
+      "elapsed_ms": 197
+    },
+    {
+      "name": "inventory",
+      "sql": "SHOW LIGHTNING TABLES gridmind_files",
+      "columns": [
+        "name",
+        "materialized_table",
+        "source_table",
+        "table_type",
+        "format",
+        "id"
+      ],
+      "row_count": 2,
+      "rows": [
+        [
+          "maintenance_history",
+          null,
+          "/home/zetaris/customer-data/shared/gridmind/maintenance_history.csv",
+          "filestore",
+          "csv",
+          "825"
+        ],
+        [
+          "tickets_database",
+          null,
+          "/home/zetaris/customer-data/shared/gridmind/tickets_database.csv",
+          "filestore",
+          "csv",
+          "837"
+        ]
+      ],
+      "elapsed_ms": 226
+    },
+    {
+      "name": "incident_federation_TR-102",
+      "sql": "SELECT s.row_id AS scada_row_id, s.ts, s.current_phase_b_amps, s.neutral_current_amps,\n       m.row_id AS maint_row_id, m.verdict AS dga_verdict, m.acetylene_ppm,\n       t.row_id AS ticket_row_id, t.ticket_type, t.reported_at\nFROM gridmind_scada_pg.scada_telemetry s\nJOIN gridmind_files.maintenance_history m ON m.asset_id = s.asset_id AND m.verdict <> 'NORMAL'\nJOIN gridmind_files.tickets_database t ON t.affected_feeder = s.feeder_id\nWHERE s.asset_id = 'TR-102' AND s.neutral_current_amps > 15\nORDER BY s.ts DESC, t.row_id",
+      "columns": [
+        "scada_row_id",
+        "ts",
+        "current_phase_b_amps",
+        "neutral_current_amps",
+        "maint_row_id",
+        "dga_verdict",
+        "acetylene_ppm",
+        "ticket_row_id",
+        "ticket_type",
+        "reported_at"
+      ],
+      "row_count": 10,
+      "rows": [
+        [
+          "SCADA-ROW-44012",
+          "2026-10-23 01:50:00.0",
+          "100.400000000000000000",
+          "37.500000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9001",
+          "RESIDUAL_CURRENT_TRIP",
+          "2026-10-23 01:45:00"
+        ],
+        [
+          "SCADA-ROW-44012",
+          "2026-10-23 01:50:00.0",
+          "100.400000000000000000",
+          "37.500000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9002",
+          "NEUTRAL_OVERLOAD_CALL",
+          "2026-10-23 01:58:00"
+        ],
+        [
+          "SCADA-ROW-44011",
+          "2026-10-23 01:40:00.0",
+          "99.500000000000000000",
+          "34.400000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9001",
+          "RESIDUAL_CURRENT_TRIP",
+          "2026-10-23 01:45:00"
+        ],
+        [
+          "SCADA-ROW-44011",
+          "2026-10-23 01:40:00.0",
+          "99.500000000000000000",
+          "34.400000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9002",
+          "NEUTRAL_OVERLOAD_CALL",
+          "2026-10-23 01:58:00"
+        ],
+        [
+          "SCADA-ROW-44010",
+          "2026-10-23 01:30:00.0",
+          "98.600000000000000000",
+          "31.300000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9001",
+          "RESIDUAL_CURRENT_TRIP",
+          "2026-10-23 01:45:00"
+        ],
+        [
+          "SCADA-ROW-44010",
+          "2026-10-23 01:30:00.0",
+          "98.600000000000000000",
+          "31.300000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9002",
+          "NEUTRAL_OVERLOAD_CALL",
+          "2026-10-23 01:58:00"
+        ],
+        [
+          "SCADA-ROW-44009",
+          "2026-10-23 01:20:00.0",
+          "97.700000000000000000",
+          "28.200000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9001",
+          "RESIDUAL_CURRENT_TRIP",
+          "2026-10-23 01:45:00"
+        ],
+        [
+          "SCADA-ROW-44009",
+          "2026-10-23 01:20:00.0",
+          "97.700000000000000000",
+          "28.200000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9002",
+          "NEUTRAL_OVERLOAD_CALL",
+          "2026-10-23 01:58:00"
+        ],
+        [
+          "SCADA-ROW-44008",
+          "2026-10-23 01:10:00.0",
+          "96.800000000000000000",
+          "25.100000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9001",
+          "RESIDUAL_CURRENT_TRIP",
+          "2026-10-23 01:45:00"
+        ],
+        [
+          "SCADA-ROW-44008",
+          "2026-10-23 01:10:00.0",
+          "96.800000000000000000",
+          "25.100000000000000000",
+          "MNT-7002",
+          "WATCH_HOT_SPOT",
+          "4.8",
+          "TKT-9002",
+          "NEUTRAL_OVERLOAD_CALL",
+          "2026-10-23 01:58:00"
+        ]
+      ],
+      "elapsed_ms": 4109
+    },
+    {
+      "name": "fleet_summary",
+      "sql": "SELECT s.asset_id, MAX(s.neutral_current_amps) AS max_neutral_a,\n       COUNT(DISTINCT t.row_id) AS open_tickets, MAX(m.acetylene_ppm) AS max_acetylene_ppm\nFROM gridmind_scada_pg.scada_telemetry s\nLEFT JOIN gridmind_files.maintenance_history m ON m.asset_id = s.asset_id\nLEFT JOIN gridmind_files.tickets_database t ON t.affected_feeder = s.feeder_id\nGROUP BY s.asset_id\nORDER BY s.asset_id",
+      "columns": [
+        "asset_id",
+        "max_neutral_a",
+        "open_tickets",
+        "max_acetylene_ppm"
+      ],
+      "row_count": 3,
+      "rows": [
+        [
+          "TR-102",
+          "37.500000000000000000",
+          "2",
+          "4.8"
+        ],
+        [
+          "TR-205",
+          "5.500000000000000000",
+          "1",
+          "0.1"
+        ],
+        [
+          "TR-310",
+          "5.800000000000000000",
+          "1",
+          "0.2"
+        ]
+      ],
+      "elapsed_ms": 1654
+    }
+  ],
+  "verdict": {
+    "real_engine_contacted": true,
+    "sql_executed": true,
+    "engine_version": "2.4.3.1",
+    "engine_build_hash": "cb88df0b",
+    "federation_rows": 10,
+    "federation_sources_joined": [
+      "maint_row_id",
+      "scada_row_id",
+      "ticket_row_id"
+    ],
+    "fleet_assets": [
+      "TR-102",
+      "TR-205",
+      "TR-310"
+    ],
+    "total_elapsed_ms": 6510,
+    "cost_usd": 0.0,
+    "password_in_report": false
+  },
+  "finished_utc": "2026-10-28T14:54:16+00:00",
+  "finished_local": "2026-10-28T11:54:16-03:00"
+}
