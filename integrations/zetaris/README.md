@@ -12,9 +12,15 @@ automatic fallback. Everything here uses **synthetic, non-confidential** data (s
 | `sql/02_setup.sql` | `CREATE DATASOURCE` (PostgreSQL) + `CREATE LIGHTNING DATABASE/FILESTORE TABLE` (CSV) |
 | `sql/04_federated.sql` | The real 3-source federated queries |
 | `runner/ZetarisJdbcRunner.java` | Single-file JDBC helper (password via env var only) |
-| `evidence/` | verify.sh output, versions, `docker ps`, query results + timings, UI capture script |
+| `evidence/` | Timestamped live runs (`05_live_verified.json`, `06`/`07` E2E traces), verify.sh output, versions, `docker ps`, query results + timings, UI capture scripts |
+| `evidence/run_live_evidence.py` | One-shot, timestamped evidence: engine version/build, containers, SQL, rows, latencies, full JSON |
+| `evidence/run_e2e_demo.py` | GridMind E2E against the real engine with a provenance trace (sources, rows, hypotheses, gate, ACK) |
+| `evidence/capture_ui_video.py` | 1080p screen recording of the real Zetaris UI running the federated SQL |
+| `evidence/render_transcript_clip.py` | Renders a recorded E2E trace as a video clip (no re-run) |
+| `../../src/sponsors/zetaris_adapter.py` | Real-first facade: `execute_query_contract()` (REAL) + `execute_virtual_query()` (labelled SIMULATION) |
 | `../../src/sponsors/zetaris_real.py` | Python bridge (subprocess to the JDBC helper) |
-| `../../docs/evidence/zetaris/` | UI screenshots + 1080p recording of the query running in the Zetaris UI |
+| `../../docs/evidence/zetaris/` | UI screenshots + 1080p recordings of the query running in the Zetaris UI |
+| `../../docs/ZETARIS_VIDEO_AUTHENTIC_SCENES.md` | Which authentic clip replaces which conceptual scene in the demo video |
 
 ## Reproduce (Windows or Linux with Docker, Java 11+)
 1. Get the Zetaris bundle and registry credentials from the organizers; `docker login` to their registry.
@@ -29,7 +35,19 @@ export ZETARIS_PASSWORD=...            # never commit / never pass on argv
 export GRIDMIND_ZETARIS_REAL=1         # opt-in
 python -m unittest discover tests      # + set GRIDMIND_ZETARIS_LIVE=1 to run the live test
 ```
-With nothing set, GridMind runs exactly as before (mock). If the engine is requested but unreachable,
-`bundle["zetaris_real"] == {"used": False, "fallback": "MOCK", "reason": ...}`; the pipeline never breaks.
+With nothing set, GridMind runs exactly as before (simulation). If the engine is requested but unreachable,
+`bundle["zetaris_real"] == {"used": False, "fallback": "SIMULATION", "is_simulation": True, "reason": ...}`; the
+pipeline never breaks.
+
+## Latest verified run (2026-10-28, UTC)
+
+| Item | Value |
+|---|---|
+| Engine | Zetaris 2.4.3.1, build `cb88df0b`, local docker compose |
+| Federated query | Postgres `gridmind_scada_pg.scada_telemetry` × CSV `maintenance_history` × CSV `tickets_database` |
+| Result | 10 joined rows for TR-102; fleet summary for TR-102 / TR-205 / TR-310 |
+| Latency | 4.1 s (JDBC cold), 1.456 s (UI), ~0.7–1.3 s warm |
+| Evidence | `evidence/05_live_verified.json`, `evidence/06_e2e_trace_TR102.json`, `evidence/07_e2e_trace_INC8812.json`, `../../docs/evidence/zetaris/zetaris_ui_live_20261028T145726Z.webm` |
+| Tests | `25 tests, 3 skipped` offline; with `GRIDMIND_ZETARIS_LIVE=1` the live JDBC test passes (`evidence/tests_live_20261028.txt`) |
 
 See `docs/ZETARIS_REAL_VS_MOCK.md` for the real-vs-mock differences.

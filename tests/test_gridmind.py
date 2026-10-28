@@ -32,8 +32,11 @@ class TestGridMindComprehensiveSuite(unittest.TestCase):
     def test_zetaris_virtual_data_fabric_query_plan(self):
         fabric = ZetarisVirtualDataFabric()
         plan = fabric.explain_query_plan("INCIDENT_FEDERATION")
-        self.assertEqual(plan["engine"], "Zetaris Lightning SQL Engine")
-        self.assertTrue(plan["zero_etl_guaranteed"])
+        # Default plan is the simulation: labelled as such, never claiming engine output.
+        self.assertEqual(plan["engine"], "SIMULATED (no engine contacted)")
+        self.assertTrue(plan["is_simulation"])
+        self.assertFalse(plan["zero_etl_guaranteed"])
+        self.assertIn("SIMULATION", plan["simulation_disclosure"])
         self.assertIn("scada_telemetry", plan["target_tables"])
         self.assertIn("maintenance_history", plan["target_tables"])
         self.assertIn("tickets_database", plan["target_tables"])

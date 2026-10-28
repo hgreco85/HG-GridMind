@@ -15,6 +15,7 @@ from pathlib import Path
 from unittest import mock
 
 from src.data_connector import FederatedDataConnector
+from src.sponsors.zetaris_adapter import ZetarisVirtualDataFabric
 from src.sponsors.zetaris_real import (
     REAL_EXECUTION_MODE,
     ZetarisRealEngine,
@@ -60,8 +61,40 @@ class TestRealEngineBridgeOffline(unittest.TestCase):
         with mock.patch.dict(os.environ, {}, clear=True):
             bundle = FederatedDataConnector(FIXTURE).execute_federated_query()
         self.assertFalse(bundle["zetaris_real"]["used"])
-        self.assertEqual(bundle["zetaris_real"]["fallback"], "MOCK")
+        self.assertEqual(bundle["zetaris_real"]["fallback"], "SIMULATION")
+        self.assertTrue(bundle["zetaris_real"]["is_simulation"])
         self.assertEqual(bundle["zetaris_execution"]["execution_mode"], "LOCAL_VIRTUAL_FEDERATION")
+        self.assertTrue(bundle["zetaris_execution"]["is_simulation"])
+        self.assertTrue(bundle["metadata"]["federation_is_simulation"])
+
+    def test_adapter_contract_falls_back_to_labelled_simulation(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            fabric = ZetarisVirtualDataFabric(use_real_engine=True)
+            res = fabric.execute_query_contract("INCIDENT_FEDERATION", asset_id="TR-102")
+        self.assertFalse(res["used"])
+        self.assertEqual(res["fallback"], "SIMULATION")
+        self.assertTrue(res["is_simulation"])
+        self.assertIn("ZETARIS_JDBC_JAR", res["reason"])
+
+    def test_adapter_contract_uses_real_engine_when_configured(self):
+        eng = _configured_engine(self.tmp)
+        fabric = ZetarisVirtualDataFabric(real_engine=eng, use_real_engine=True)
+        proc = subprocess.CompletedProcess([], 0, stdout=json.dumps(FAKE_OUTPUT).encode(), stderr=b"")
+        env = {"ZETARIS_PASSWORD": "s3cret-test-value", "PATH": os.environ.get("PATH", "")}
+        with mock.patch.dict(os.environ, env, clear=True), \
+             mock.patch("src.sponsors.zetaris_real.shutil.which", return_value="/usr/bin/java"), \
+             mock.patch("src.sponsors.zetaris_real.subprocess.run", return_value=proc) as run:
+            res = fabric.execute_query_contract("INCIDENT_FEDERATION", asset_id="TR-102")
+            executed_sql = run.call_args.kwargs["input"].decode()
+            real_available = fabric.real_engine_status()["available"]
+        self.assertTrue(real_available)
+        self.assertTrue(res["used"])
+        self.assertFalse(res["is_simulation"])
+        self.assertEqual(res["execution_mode"], REAL_EXECUTION_MODE)
+        self.assertEqual(res["row_count"], 2)
+        # the executed SQL targets the real federated tables, not the illustrative alias
+        self.assertIn("gridmind_scada_pg.scada_telemetry", executed_sql)
+        self.assertIn("gridmind_files.maintenance_history", executed_sql)
 
     def test_requested_but_unavailable_falls_back_without_raising(self):
         with mock.patch.dict(os.environ, {}, clear=True):

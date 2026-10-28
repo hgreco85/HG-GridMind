@@ -42,7 +42,12 @@ class FederatedDataConnector:
         self.use_real_meterless = use_real_meterless
         self.meterless_engine = meterless_engine or MeterlessHMemEngine()
         self._data: Dict[str, Any] = {}
-        self.zetaris_fabric = ZetarisVirtualDataFabric(endpoint_url=zetaris_endpoint)
+        # The adapter owns both paths: real engine first (opt-in), simulation fallback.
+        self.zetaris_fabric = ZetarisVirtualDataFabric(
+            endpoint_url=zetaris_endpoint,
+            real_engine=self.real_engine,
+            use_real_engine=use_real_engine,
+        )
         self.load()
 
     def load(self) -> None:
@@ -60,6 +65,7 @@ class FederatedDataConnector:
 
         sources = self._data.get("synthetic_sources", {})
         zetaris_real = self._try_real_engine()
+        real_rows = bool(zetaris_real.get("used"))
         result = {
             "incident_id": self._data.get("incident_id", "UNKNOWN"),
             "asset_id": self._data.get("asset_id", "UNKNOWN"),
@@ -69,32 +75,38 @@ class FederatedDataConnector:
             "scada": sources.get("scada_telemetry", []),
             "zetaris_execution": federated_execution["execution_plan"],
             "metadata": {
-                "federation_engine": "Zetaris Virtual Data Fabric (Lightning SQL)",
+                "federation_engine": (
+                    "Zetaris Lightning (REAL, local docker compose)"
+                    if real_rows
+                    else "SIMULATED federation (fixture replay, no engine contacted)"
+                ),
+                "federation_is_simulation": not real_rows,
+                "real_engine_rows": zetaris_real.get("row_count") if real_rows else 0,
                 "sources_joined": 3,
                 "rows_evaluated": federated_execution["total_rows_evaluated"],
                 "cost_usd": 0.0,
                 "zero_etl": True,
             },
         }
+        if not real_rows:
+            result["metadata"]["simulation_disclosure"] = federated_execution.get("simulation_disclosure")
         result["zetaris_real"] = zetaris_real
         result["meterless_real"] = self._try_real_meterless(zetaris_real)
         return result
 
     def _try_real_engine(self) -> Dict[str, Any]:
-        """Optionally runs the same federation on the real Zetaris engine.
+        """Runs the federation on the real Zetaris engine through the adapter.
 
-        Never raises: on any problem returns ``{"used": False, "fallback": "MOCK", ...}`` so the
-        deterministic offline pipeline is unaffected. Real rows are additive evidence; they are
-        keyed by the real engine's own synthetic dataset (see integrations/zetaris/).
+        Never raises: the adapter returns ``{"used": False, "fallback": "SIMULATION", ...}``
+        on any problem, so the deterministic offline pipeline is unaffected. Real rows are
+        additive evidence; they are keyed by the real engine's own synthetic dataset
+        (see integrations/zetaris/).
         """
         if not self.use_real_engine:
-            return {"used": False, "fallback": "MOCK", "reason": "real engine not requested"}
+            return {"used": False, "fallback": "SIMULATION", "is_simulation": True,
+                    "reason": "real engine not requested"}
         asset_id = os.environ.get("GRIDMIND_ZETARIS_ASSET_ID") or self._data.get("asset_id", "")
-        try:
-            res = self.real_engine.incident_federation(str(asset_id))
-        except (ZetarisRealEngineUnavailable, ValueError) as exc:
-            return {"used": False, "fallback": "MOCK", "reason": str(exc)[:240]}
-        return {"used": True, "asset_id": asset_id, **res}
+        return self.zetaris_fabric.execute_query_contract("INCIDENT_FEDERATION", asset_id=asset_id)
 
 
     def _try_real_meterless(self, zetaris_real: Dict[str, Any]) -> Dict[str, Any]:

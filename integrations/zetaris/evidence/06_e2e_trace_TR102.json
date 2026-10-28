@@ -1,0 +1,270 @@
+{
+  "trace_schema": "hg-gridmind/e2e-trace/1",
+  "started_utc": "2026-10-28T14:55:54+00:00",
+  "finished_utc": "2026-10-28T14:55:56+00:00",
+  "fixture": "incident_INC_2026_UTIL_5501.json",
+  "incident_id": "INC-2026-UTIL-5501",
+  "asset_id": "TR-102",
+  "provenance": {
+    "reasoning_rows": "fixtures (deterministic, synthetic)",
+    "zetaris_evidence_rows": "REAL engine (gridmind_scada_pg + gridmind_files)",
+    "real_engine_rows": 10,
+    "is_simulation_fallback": false
+  },
+  "sources": [
+    {
+      "name": "gridmind_scada_pg.scada_telemetry",
+      "kind": "PostgreSQL JDBC datasource"
+    },
+    {
+      "name": "gridmind_files.maintenance_history",
+      "kind": "CSV Lightning filestore table"
+    },
+    {
+      "name": "gridmind_files.tickets_database",
+      "kind": "CSV Lightning filestore table"
+    }
+  ],
+  "hypotheses": {
+    "falsified": [],
+    "supported_citations": [
+      {
+        "source_table": "scada_telemetry",
+        "row_id": "SCADA-ROW-44001",
+        "fact": "SCADA current/voltage evaluated: relay flags=['RESIDUAL_CURRENT_ALARM_INTERMITTENT']"
+      }
+    ]
+  },
+  "root_cause": "Causa Indeterminada \u2014 Abstenci\u00f3n obligatoria por insuficiencia de registros f\u00edsicos.",
+  "recommended_action": "Solicitar inspecci\u00f3n de campo y toma de muestra qu\u00edmica de aceite.",
+  "gate": {
+    "approval_required": true,
+    "authorized": true
+  },
+  "audit_ack": "HG-GRIDMIND-ACK-36BF41AE2B883F93",
+  "sponsor_metadata": {
+    "zetaris": {
+      "federation_engine": "Zetaris Lightning (REAL, local docker compose)",
+      "federation_is_simulation": false,
+      "real_engine_rows": 10,
+      "sources_joined": 3,
+      "rows_evaluated": 1,
+      "cost_usd": 0.0,
+      "zero_etl": true
+    },
+    "meterless": {
+      "meterless_engine": "Meterless Context Protocol v1.4",
+      "h_mem_events_count": 1,
+      "markovian_states": [
+        {
+          "timestamp": "2026-10-18T10:00:00Z",
+          "state_name": "NORMAL_STEADY_STATE",
+          "transition_probability": 1.0,
+          "trigger_event": "Routine DGA chemical sampling (all gases within normal boundaries)"
+        },
+        {
+          "timestamp": "2026-10-19T14:30:00Z",
+          "state_name": "LATENT_THERMAL_DEGRADATION",
+          "transition_probability": 0.88,
+          "trigger_event": "Loose terminal connection detected on low-voltage neutral bushing (+42C delta T)"
+        },
+        {
+          "timestamp": "2026-10-20T18:44:00Z",
+          "state_name": "ASYMMETRIC_OVERLOAD",
+          "transition_probability": 0.96,
+          "trigger_event": "Phase B load surges to 445.8A while Phase A remains 210.4A; neutral current hits 268A"
+        },
+        {
+          "timestamp": "2026-10-20T18:45:12Z",
+          "state_name": "PROTECTION_TRIP",
+          "transition_probability": 1.0,
+          "trigger_event": "Feeder breaker B-12 tripped on neutral overcurrent relay 50/51N"
+        }
+      ],
+      "world_model": {
+        "substation": "SUBSTATION_NORTH_44",
+        "transformer": {
+          "id": "TR-404",
+          "rating_kva": 1000,
+          "primary_kv": 13.2,
+          "secondary_kv": 0.38,
+          "connection": "Dyn11 (Delta-Wye with Neutral)"
+        },
+        "topological_invariants": [
+          "Kirchhoff Current Law: I_neutral = -(I_phase_A + I_phase_B + I_phase_C)",
+          "Joule Heating Law: P_dissipated = (I_neutral)^2 * R_terminal_contact",
+          "Insulation Arc Law: Arcing causes immediate sharp spike in Acetylene (C2H2) > 2 ppm"
+        ],
+        "falsification_checks": {
+          "internal_arc_possible": false,
+          "reason": "High contact resistance + 268A neutral current generates localized dissipation exceeding 3 kW at the lug",
+          "terminal_overheating_confirmed": true
+        }
+      },
+      "cost_usd": 0.0
+    },
+    "nemotron": {
+      "model": "nvidia/nemotron-3-nano-30b-instruct",
+      "execution_mode": "DETERMINISTIC_PHYSICAL_REASONER",
+      "cost_usd": 0.0,
+      "reasoning_steps": 4
+    }
+  },
+  "real_engine_detail": {
+    "used": true,
+    "is_simulation": false,
+    "asset_id": "TR-102",
+    "execution_mode": "REAL_ZETARIS_ENGINE_LOCAL_DOCKER",
+    "engine_status": {
+      "requested": true,
+      "configured": true,
+      "available": true,
+      "reason": "real engine configured",
+      "execution_mode": "REAL_ZETARIS_ENGINE_LOCAL_DOCKER"
+    },
+    "sql": "SELECT s.row_id AS scada_row_id, s.ts, s.current_phase_b_amps, s.neutral_current_amps,\n       m.row_id AS maint_row_id, m.verdict AS dga_verdict, m.acetylene_ppm,\n       t.row_id AS ticket_row_id, t.ticket_type, t.reported_at\nFROM gridmind_scada_pg.scada_telemetry s\nJOIN gridmind_files.maintenance_history m ON m.asset_id = s.asset_id AND m.verdict <> 'NORMAL'\nJOIN gridmind_files.tickets_database t ON t.affected_feeder = s.feeder_id\nWHERE s.asset_id = 'TR-102' AND s.neutral_current_amps > 15.0\nORDER BY s.ts DESC, t.row_id",
+    "columns": [
+      "scada_row_id",
+      "ts",
+      "current_phase_b_amps",
+      "neutral_current_amps",
+      "maint_row_id",
+      "dga_verdict",
+      "acetylene_ppm",
+      "ticket_row_id",
+      "ticket_type",
+      "reported_at"
+    ],
+    "rows": [
+      {
+        "scada_row_id": "SCADA-ROW-44012",
+        "ts": "2026-10-23 01:50:00.0",
+        "current_phase_b_amps": "100.400000000000000000",
+        "neutral_current_amps": "37.500000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9001",
+        "ticket_type": "RESIDUAL_CURRENT_TRIP",
+        "reported_at": "2026-10-23 01:45:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44012",
+        "ts": "2026-10-23 01:50:00.0",
+        "current_phase_b_amps": "100.400000000000000000",
+        "neutral_current_amps": "37.500000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9002",
+        "ticket_type": "NEUTRAL_OVERLOAD_CALL",
+        "reported_at": "2026-10-23 01:58:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44011",
+        "ts": "2026-10-23 01:40:00.0",
+        "current_phase_b_amps": "99.500000000000000000",
+        "neutral_current_amps": "34.400000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9001",
+        "ticket_type": "RESIDUAL_CURRENT_TRIP",
+        "reported_at": "2026-10-23 01:45:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44011",
+        "ts": "2026-10-23 01:40:00.0",
+        "current_phase_b_amps": "99.500000000000000000",
+        "neutral_current_amps": "34.400000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9002",
+        "ticket_type": "NEUTRAL_OVERLOAD_CALL",
+        "reported_at": "2026-10-23 01:58:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44010",
+        "ts": "2026-10-23 01:30:00.0",
+        "current_phase_b_amps": "98.600000000000000000",
+        "neutral_current_amps": "31.300000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9001",
+        "ticket_type": "RESIDUAL_CURRENT_TRIP",
+        "reported_at": "2026-10-23 01:45:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44010",
+        "ts": "2026-10-23 01:30:00.0",
+        "current_phase_b_amps": "98.600000000000000000",
+        "neutral_current_amps": "31.300000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9002",
+        "ticket_type": "NEUTRAL_OVERLOAD_CALL",
+        "reported_at": "2026-10-23 01:58:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44009",
+        "ts": "2026-10-23 01:20:00.0",
+        "current_phase_b_amps": "97.700000000000000000",
+        "neutral_current_amps": "28.200000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9001",
+        "ticket_type": "RESIDUAL_CURRENT_TRIP",
+        "reported_at": "2026-10-23 01:45:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44009",
+        "ts": "2026-10-23 01:20:00.0",
+        "current_phase_b_amps": "97.700000000000000000",
+        "neutral_current_amps": "28.200000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9002",
+        "ticket_type": "NEUTRAL_OVERLOAD_CALL",
+        "reported_at": "2026-10-23 01:58:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44008",
+        "ts": "2026-10-23 01:10:00.0",
+        "current_phase_b_amps": "96.800000000000000000",
+        "neutral_current_amps": "25.100000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9001",
+        "ticket_type": "RESIDUAL_CURRENT_TRIP",
+        "reported_at": "2026-10-23 01:45:00"
+      },
+      {
+        "scada_row_id": "SCADA-ROW-44008",
+        "ts": "2026-10-23 01:10:00.0",
+        "current_phase_b_amps": "96.800000000000000000",
+        "neutral_current_amps": "25.100000000000000000",
+        "maint_row_id": "MNT-7002",
+        "dga_verdict": "WATCH_HOT_SPOT",
+        "acetylene_ppm": "4.8",
+        "ticket_row_id": "TKT-9002",
+        "ticket_type": "NEUTRAL_OVERLOAD_CALL",
+        "reported_at": "2026-10-23 01:58:00"
+      }
+    ],
+    "row_count": 10,
+    "elapsed_ms": 688,
+    "engine": "Zetaris Lightning (real, docker compose)",
+    "sources": [
+      "gridmind_scada_pg (PostgreSQL JDBC datasource)",
+      "gridmind_files.maintenance_history (CSV filestore)",
+      "gridmind_files.tickets_database (CSV filestore)"
+    ],
+    "data_movement_required": false
+  }
+}
