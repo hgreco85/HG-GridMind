@@ -68,7 +68,10 @@ def build_lines(trace: dict) -> list[tuple[str, str]]:
     lines.append(("head", "[6] CAUSA RAIZ CONFIRMADA"))
     lines.append(("body", "  " + str(trace.get("root_cause"))))
     lines.append(("head", "[7] ACCION RECOMENDADA + HUMAN APPROVAL GATE"))
-    lines.append(("body", "  " + str(trace.get("recommended_action"))[:220]))
+    action = str(trace.get("recommended_action") or "")
+    while action:
+        lines.append(("body", "  " + action[:150]))
+        action = action[150:]
     gate = trace.get("gate", {})
     lines.append(("body", f"  approval_required={gate.get('approval_required')} authorized={gate.get('authorized')}"))
     lines.append(("ok", f"  audit ACK {trace.get('audit_ack')}"))

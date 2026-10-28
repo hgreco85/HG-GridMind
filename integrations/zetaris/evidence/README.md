@@ -13,7 +13,7 @@ Data: **synthetic** (seed 5501). No secret is stored in any file here.
 | `verify.txt`, `versions.txt`, `docker_ps.txt`, `log_*.txt` | `verify.sh` 9/9 PASS, image digests, container list, bootstrap/api/driver logs | 2026-10-27 |
 | `../docs/evidence/zetaris/zetaris_ui_live_20261028T145726Z.webm` | 1080p screen recording of the **Zetaris UI** running the federated SQL: `Success · Total Count: 10 · Query Time: 1.456 s` | 2026-10-28 14:57 |
 | `../docs/evidence/zetaris/ui_live_20261028T145726Z_*.png` | Keyframes of that session (login masked, catalog tree, SQL, results grid) | 2026-10-28 14:57 |
-| `../docs/evidence/zetaris/gridmind_e2e_transcript_20261028T145846Z.webm` | Clip of the E2E trace (rendered from `07_e2e_trace_INC8812.json`, not re-run) | 2026-10-28 14:58 |
+| `../docs/evidence/zetaris/gridmind_e2e_transcript_20261028T150347Z.webm` | Clip of the E2E trace (rendered from `07_e2e_trace_INC8812.json`, not re-run) | 2026-10-28 14:58 |
 
 ## Reproduce
 

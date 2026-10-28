@@ -9,7 +9,7 @@ grabado el **2026-10-28** con el motor Zetaris 2.4.3.1 corriendo en Docker local
 | ID | Archivo | Tipo | Duración | Contenido verificable |
 |---|---|---|---|---|
 | A | `docs/evidence/zetaris/zetaris_ui_live_20261028T145726Z.webm` | video 1920×1080 | 44.7 s | UI real de Zetaris: login (password enmascarado) → Data Explorer → SQL Workspace → se tipea la consulta federada → `Execute` → grilla con `Success · Total Count: 10 · Query Time: 1.456 s` |
-| B | `docs/evidence/zetaris/gridmind_e2e_transcript_20261028T145846Z.webm` | video 1920×1080 | 30.6 s | Traza E2E de GridMind (desde `07_e2e_trace_INC8812.json`): fuentes, SQL, filas citables, hipótesis falsadas, causa raíz, gate, ACK |
+| B | `docs/evidence/zetaris/gridmind_e2e_transcript_20261028T150347Z.webm` | video 1920×1080 | 30.6 s | Traza E2E de GridMind (desde `07_e2e_trace_INC8812.json`): fuentes, SQL, filas citables, hipótesis falsadas, causa raíz, gate, ACK |
 | C | `docs/evidence/zetaris/ui_live_20261028T145726Z_05_results.png` | still | — | Grilla de resultados con `SCADA-ROW-44012`, `MNT-7002 (WATCH_HOT_SPOT)`, `TKT-9001/9002` |
 | D | `integrations/zetaris/evidence/05_live_verified.json` | JSON | — | Versión/build del motor, contenedores, SQL, filas, latencias, timestamps |
 | E | `docs/evidence/zetaris/ui_live_20261028T145726Z_03_catalog_tree.png` | still | — | Catálogo real: `gridmind_scada_pg` (PostgreSQL) + `gridmind_files` (CSV) |
